@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, ArrowRight, Volume2 } from "lucide-react";
+import { Loader2, Send, ArrowRight, Volume2, Palette } from "lucide-react";
 import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
@@ -17,6 +17,7 @@ const DEFAULT_PROFILE = {
 };
 
 export default function Index() {
+  const [warmTheme, setWarmTheme] = useState(false);
   const [level, setLevel] = useState(1);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");
@@ -41,6 +42,10 @@ export default function Index() {
     previousMissPatterns: [],
     recentlyPracticedWords: [],
   });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", warmTheme ? "warm" : "");
+  }, [warmTheme]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -127,9 +132,16 @@ export default function Index() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-lg px-4 py-6 sm:py-10">
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 relative">
           <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
           <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
+          <button
+            onClick={() => setWarmTheme((v) => !v)}
+            className="absolute top-0 right-0 p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
+            title={warmTheme ? "Switch to Teal theme" : "Switch to Warm theme"}
+          >
+            <Palette className="h-4 w-4 text-muted-foreground" />
+          </button>
         </div>
 
         {/* Level Selector */}

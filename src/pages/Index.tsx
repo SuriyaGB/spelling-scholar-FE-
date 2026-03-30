@@ -52,6 +52,8 @@ export default function Index() {
     setDefOpen(false);
     setExOpen(false);
     setOrigOpen(false);
+    setAudioError(null);
+    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
     try {

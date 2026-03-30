@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, ArrowRight, Volume2 } from "lucide-react";
+import { Loader2, Send, ArrowRight, Volume2, Palette } from "lucide-react";
 import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";

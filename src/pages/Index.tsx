@@ -99,6 +99,23 @@ export default function Index() {
 
   const handleNextWord = () => loadWord(level);
 
+  const playPronunciation = async () => {
+    if (!word || audioLoading) return;
+    setAudioLoading(true);
+    setAudioError(null);
+    try {
+      const url = await fetchPronunciationAudio(word.word);
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = url;
+      const audio = new Audio(url);
+      await audio.play();
+    } catch {
+      setAudioError("Could not play audio.");
+    } finally {
+      setAudioLoading(false);
+    }
+  };
+
   const toggleDef = () => { setDefOpen((v) => !v); supportsViewed.current.definitionViewed = true; };
   const toggleEx = () => { setExOpen((v) => !v); supportsViewed.current.exampleViewed = true; };
   const toggleOrig = () => { setOrigOpen((v) => !v); supportsViewed.current.originViewed = true; };

@@ -43,6 +43,10 @@ export default function Index() {
     recentlyPracticedWords: [],
   });
 
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", warmTheme ? "warm" : "");
+  }, [warmTheme]);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadWord = useCallback(async (lvl: number) => {

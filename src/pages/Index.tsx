@@ -5,7 +5,7 @@ import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
 import { DebugPanel } from "@/components/DebugPanel";
-import { fetchNextWord, submitSpellingAttempt } from "@/lib/api";
+import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type { WordData, CoachingResponse, SupportsUsed, SessionContext } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +24,9 @@ export default function Index() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CoachingResponse | null>(null);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
   const [defOpen, setDefOpen] = useState(false);
   const [exOpen, setExOpen] = useState(false);
@@ -49,6 +52,8 @@ export default function Index() {
     setDefOpen(false);
     setExOpen(false);
     setOrigOpen(false);
+    setAudioError(null);
+    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
     try {
@@ -93,6 +98,23 @@ export default function Index() {
   };
 
   const handleNextWord = () => loadWord(level);
+
+  const playPronunciation = async () => {
+    if (!word || audioLoading) return;
+    setAudioLoading(true);
+    setAudioError(null);
+    try {
+      const url = await fetchPronunciationAudio(word.word);
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = url;
+      const audio = new Audio(url);
+      await audio.play();
+    } catch {
+      setAudioError("Could not play audio.");
+    } finally {
+      setAudioLoading(false);
+    }
+  };
 
   const toggleDef = () => { setDefOpen((v) => !v); supportsViewed.current.definitionViewed = true; };
   const toggleEx = () => { setExOpen((v) => !v); supportsViewed.current.exampleViewed = true; };
@@ -142,6 +164,29 @@ export default function Index() {
         {/* Word Practice Area */}
         {hasWord && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            {/* Pronounce Word Button */}
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={playPronunciation}
+                disabled={audioLoading}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold text-lg transition-all",
+                  "bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "shadow-md hover:shadow-lg"
+                )}
+              >
+                {audioLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <Volume2 className="h-6 w-6" />
+                )}
+                {audioLoading ? "Loading…" : "Hear the Word"}
+              </button>
+              {audioError && (
+                <p className="text-xs text-destructive">{audioError}</p>
+              )}
+            </div>
+
             {/* Word metadata bar */}
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <span className="text-xs rounded-full bg-primary/10 text-primary px-2.5 py-1 font-medium">
@@ -158,11 +203,6 @@ export default function Index() {
               <span className="text-xs rounded-full bg-chip-accent text-chip-accent-foreground px-2.5 py-1 font-medium">
                 {word.partOfSpeech}
               </span>
-              {word.pronunciation && (
-                <button className="text-xs flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors" title="Audio coming soon">
-                  <Volume2 className="h-3 w-3" /> {word.pronunciation}
-                </button>
-              )}
             </div>
 
             {/* Support Buttons */}

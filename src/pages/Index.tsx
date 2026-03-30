@@ -164,6 +164,29 @@ export default function Index() {
         {/* Word Practice Area */}
         {hasWord && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            {/* Pronounce Word Button */}
+            <div className="flex flex-col items-center gap-2">
+              <button
+                onClick={playPronunciation}
+                disabled={audioLoading}
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold text-lg transition-all",
+                  "bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed",
+                  "shadow-md hover:shadow-lg"
+                )}
+              >
+                {audioLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <Volume2 className="h-6 w-6" />
+                )}
+                {audioLoading ? "Loading…" : "Hear the Word"}
+              </button>
+              {audioError && (
+                <p className="text-xs text-destructive">{audioError}</p>
+              )}
+            </div>
+
             {/* Word metadata bar */}
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <span className="text-xs rounded-full bg-primary/10 text-primary px-2.5 py-1 font-medium">
@@ -180,11 +203,6 @@ export default function Index() {
               <span className="text-xs rounded-full bg-chip-accent text-chip-accent-foreground px-2.5 py-1 font-medium">
                 {word.partOfSpeech}
               </span>
-              {word.pronunciation && (
-                <button className="text-xs flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors" title="Audio coming soon">
-                  <Volume2 className="h-3 w-3" /> {word.pronunciation}
-                </button>
-              )}
             </div>
 
             {/* Support Buttons */}

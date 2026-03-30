@@ -92,7 +92,22 @@ export async function fetchNextWord(level: number): Promise<WordData> {
   return res.json();
 }
 
+export async function fetchPronunciationAudio(word: string): Promise<string> {
+  const res = await fetch(`${BASE_URL}/api/words/${encodeURIComponent(word)}/pronunciation`);
+  if (!res.ok) throw new Error("Failed to fetch pronunciation");
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
 export async function submitSpellingAttempt(body: CoachingRequest): Promise<CoachingResponse> {
+  const res = await fetch(`${BASE_URL}/api/spelling-coach`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error("Failed to submit attempt");
+  return res.json();
+}
   const res = await fetch(`${BASE_URL}/api/spelling-coach`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -5,7 +5,7 @@ import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
 import { DebugPanel } from "@/components/DebugPanel";
-import { fetchNextWord, submitSpellingAttempt } from "@/lib/api";
+import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type { WordData, CoachingResponse, SupportsUsed, SessionContext } from "@/lib/api";
 import { cn } from "@/lib/utils";
 

@@ -24,6 +24,9 @@ export default function Index() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CoachingResponse | null>(null);
+  const [audioLoading, setAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
   const [defOpen, setDefOpen] = useState(false);
   const [exOpen, setExOpen] = useState(false);

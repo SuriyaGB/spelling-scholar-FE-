@@ -108,11 +108,3 @@ export async function submitSpellingAttempt(body: CoachingRequest): Promise<Coac
   if (!res.ok) throw new Error("Failed to submit attempt");
   return res.json();
 }
-  const res = await fetch(`${BASE_URL}/api/spelling-coach`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error("Failed to submit attempt");
-  return res.json();
-}

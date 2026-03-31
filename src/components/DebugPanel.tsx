@@ -33,10 +33,29 @@ export function DebugPanel({ level, wordData, supports, response }: DebugPanelPr
             <pre className="mt-1">{JSON.stringify(supports, null, 2)}</pre>
           </div>
           {response && (
-            <div>
-              <strong>Raw Response:</strong>
-              <pre className="mt-1 whitespace-pre-wrap">{JSON.stringify(response, null, 2)}</pre>
-            </div>
+            <>
+              <div>
+                <strong>Error Relevance:</strong>
+                <pre className="mt-1 whitespace-pre-wrap">
+                  {JSON.stringify({
+                    mostRelevantToError: response.errorRelevance?.mostRelevantToError,
+                    confidence: response.errorRelevance?.confidence,
+                  }, null, 2)}
+                </pre>
+              </div>
+              <div>
+                <strong>Form Teaching:</strong>
+                <pre className="mt-1 whitespace-pre-wrap">{JSON.stringify(response.wordTeaching?.formTeaching, null, 2)}</pre>
+              </div>
+              <div>
+                <strong>Concept Teaching:</strong>
+                <pre className="mt-1 whitespace-pre-wrap">{JSON.stringify(response.wordTeaching?.conceptTeaching, null, 2)}</pre>
+              </div>
+              <div>
+                <strong>Full Raw Response:</strong>
+                <pre className="mt-1 whitespace-pre-wrap">{JSON.stringify(response, null, 2)}</pre>
+              </div>
+            </>
           )}
         </div>
       )}

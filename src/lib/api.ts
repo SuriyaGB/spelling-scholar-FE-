@@ -50,6 +50,30 @@ export interface CoachingResponse {
     summary: string;
     errorTypes: string[];
     primaryErrorFocus: string;
+    likelyWrongWordInterpretation: boolean;
+    usedMeaningDisambiguationWell: boolean;
+  };
+  wordTeaching: {
+    formTeaching: {
+      summary: string;
+      patterns: string[];
+      chunks: string[];
+      chunkReason: string;
+      sayAloudFocus: string;
+    };
+    conceptTeaching: {
+      summary: string;
+      meaningFocus: string;
+      originFocus: string;
+      morphologyFocus: string;
+      originLabels: string[];
+      morphologyLabels: string[];
+    };
+  };
+  errorRelevance: {
+    mostRelevantToError: string;
+    confidence: number;
+    reason: string;
   };
   teachingDecision: {
     strategy: string;

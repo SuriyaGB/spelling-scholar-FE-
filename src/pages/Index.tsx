@@ -136,13 +136,7 @@ export default function Index() {
         <div className="text-center mb-6 relative">
           <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
           <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
-          <button
-            onClick={() => setWarmTheme((v) => !v)}
-            className="absolute top-0 right-0 p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
-            title={warmTheme ? "Switch to Teal theme" : "Switch to Warm theme"}
-          >
-            <Palette className="h-4 w-4 text-muted-foreground" />
-          </button>
+          <ThemePicker current={theme} onChange={setTheme} />
         </div>
 
         {/* Level Selector */}

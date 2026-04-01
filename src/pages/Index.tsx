@@ -45,8 +45,8 @@ export default function Index() {
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", warmTheme ? "warm" : "");
-  }, [warmTheme]);
+    document.documentElement.setAttribute("data-theme", theme === "default" ? "" : theme);
+  }, [theme]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

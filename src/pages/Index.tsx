@@ -18,7 +18,7 @@ const DEFAULT_PROFILE = {
 };
 
 export default function Index() {
-  const [warmTheme, setWarmTheme] = useState(false);
+  const [theme, setTheme] = useState<ThemeKey>("default");
   const [level, setLevel] = useState(1);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");

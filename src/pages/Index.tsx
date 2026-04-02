@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, ArrowRight, Volume2 } from "lucide-react";
+import { Loader2, Send, ArrowRight, Volume2, Volume1, VolumeX } from "lucide-react";
+import { useCheer } from "@/hooks/use-cheer";
 import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
@@ -19,6 +20,7 @@ const DEFAULT_PROFILE = {
 
 export default function Index() {
   const [theme, setTheme] = useState<ThemeKey>("default");
+  const { soundEnabled, toggleSound, playCheer } = useCheer();
   const [level, setLevel] = useState(1);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");
@@ -91,6 +93,7 @@ export default function Index() {
         sessionContext: session,
       });
       setResult(res);
+      if (res.correctness?.isCorrect) playCheer();
       setSession((s) => ({
         ...s,
         previousAttemptsOnThisWord: s.previousAttemptsOnThisWord + 1,
@@ -139,7 +142,14 @@ export default function Index() {
             <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
             <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex items-center justify-end gap-1">
+            <button
+              onClick={toggleSound}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              title={soundEnabled ? "Mute cheer sound" : "Unmute cheer sound"}
+            >
+              {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
             <ThemePicker current={theme} onChange={setTheme} />
           </div>
         </div>

@@ -10,6 +10,7 @@ import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type { WordData, CoachingResponse, SupportsUsed, SessionContext } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import beePng from "@/assets/bee.png";
 
 const DEFAULT_PROFILE = {
   childId: "c1",

@@ -93,6 +93,7 @@ export default function Index() {
         sessionContext: session,
       });
       setResult(res);
+      if (res.correctness?.isCorrect) playCheer();
       setSession((s) => ({
         ...s,
         previousAttemptsOnThisWord: s.previousAttemptsOnThisWord + 1,

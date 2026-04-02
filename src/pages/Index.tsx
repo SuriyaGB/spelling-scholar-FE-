@@ -142,7 +142,14 @@ export default function Index() {
             <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
             <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex items-center justify-end gap-1">
+            <button
+              onClick={toggleSound}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              title={soundEnabled ? "Mute cheer sound" : "Unmute cheer sound"}
+            >
+              {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
             <ThemePicker current={theme} onChange={setTheme} />
           </div>
         </div>

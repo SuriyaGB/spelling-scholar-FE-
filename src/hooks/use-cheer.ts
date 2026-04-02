@@ -14,7 +14,7 @@ export function useCheer() {
   });
 
   useEffect(() => {
-    const a = new Audio("/cheer.wav");
+    const a = new Audio("/cheer.mp3");
     a.preload = "auto";
     audioRef.current = a;
     return () => { a.pause(); a.src = ""; };

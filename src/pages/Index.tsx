@@ -10,6 +10,7 @@ import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type { WordData, CoachingResponse, SupportsUsed, SessionContext } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import beePng from "@/assets/bee.png";
 
 const DEFAULT_PROFILE = {
   childId: "c1",
@@ -138,10 +139,13 @@ export default function Index() {
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1" />
-          <div className="text-center">
-            <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
-            <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
-          </div>
+           <div className="text-center flex items-center justify-center gap-2">
+             <img src={beePng} alt="Spelling bee mascot" className="h-10 w-auto -mr-1" />
+             <div>
+               <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
+               <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
+             </div>
+           </div>
           <div className="flex-1 flex items-center justify-end gap-1">
             <button
               onClick={toggleSound}

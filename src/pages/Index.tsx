@@ -146,7 +146,6 @@ export default function Index() {
                <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
              </div>
            </div>
-          </div>
           <div className="flex-1 flex items-center justify-end gap-1">
             <button
               onClick={toggleSound}

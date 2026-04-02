@@ -20,6 +20,7 @@ const DEFAULT_PROFILE = {
 
 export default function Index() {
   const [theme, setTheme] = useState<ThemeKey>("default");
+  const { soundEnabled, toggleSound, playCheer } = useCheer();
   const [level, setLevel] = useState(1);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");

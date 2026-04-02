@@ -130,7 +130,7 @@ export default function Index() {
   const submitted = !!result;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-lg px-4 py-6 sm:py-10">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">

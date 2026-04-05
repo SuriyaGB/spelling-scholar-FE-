@@ -140,7 +140,7 @@ export default function Index() {
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1" />
            <div className="text-center flex items-center justify-center gap-2">
-             <img src={beePng} alt="Spelling bee mascot" className="h-10 w-auto -mr-1" />
+             <img src={beePng} alt="Spelling bee mascot" className="h-12 w-auto -mr-1" />
              <div>
                <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
                <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
@@ -273,6 +273,24 @@ export default function Index() {
             {/* Results */}
             {submitted && result && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                {/* Attempt vs Correct comparison */}
+                {word && (
+                  <div className="rounded-xl border-2 border-border bg-card p-4 text-center space-y-1">
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your spelling</p>
+                    <p className={cn(
+                      "text-2xl font-display tracking-widest",
+                      result.correctness.isCorrect ? "text-success" : "text-destructive line-through decoration-2"
+                    )}>
+                      {attempt}
+                    </p>
+                    {!result.correctness.isCorrect && (
+                      <>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide pt-2">Correct spelling</p>
+                        <p className="text-2xl font-display tracking-widest text-success">{word.word}</p>
+                      </>
+                    )}
+                  </div>
+                )}
                 <CoachingResult result={result} />
                 <button
                   onClick={handleNextWord}

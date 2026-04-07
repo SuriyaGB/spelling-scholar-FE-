@@ -110,9 +110,52 @@ export async function checkHealth(): Promise<{ status: string }> {
   return res.json();
 }
 
-export async function fetchNextWord(level: number): Promise<WordData> {
-  const res = await fetch(`${BASE_URL}/api/words/next?level=${level}`);
+export interface CustomListSummary {
+  id: string;
+  name: string;
+  level: string;
+  wordCount: number;
+}
+
+export interface ImportCustomListRequest {
+  listName: string;
+  words: string[];
+  level: string;
+  overwriteList: boolean;
+}
+
+export interface ImportCustomListResponse {
+  list: CustomListSummary;
+  importedCount: number;
+  skippedExistingCount: number;
+  words: WordData[];
+}
+
+export interface CustomListsResponse {
+  lists: CustomListSummary[];
+}
+
+export async function fetchNextWord(level: number, customListId?: string): Promise<WordData> {
+  const params = new URLSearchParams({ level: String(level) });
+  if (customListId) params.set("customListId", customListId);
+  const res = await fetch(`${BASE_URL}/api/words/next?${params}`);
   if (!res.ok) throw new Error("Failed to fetch word");
+  return res.json();
+}
+
+export async function fetchCustomLists(): Promise<CustomListsResponse> {
+  const res = await fetch(`${BASE_URL}/api/custom-lists`);
+  if (!res.ok) throw new Error("Failed to fetch custom lists");
+  return res.json();
+}
+
+export async function importCustomWordList(payload: ImportCustomListRequest): Promise<ImportCustomListResponse> {
+  const res = await fetch(`${BASE_URL}/api/words/import-custom`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to import custom list");
   return res.json();
 }
 

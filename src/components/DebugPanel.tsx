@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { Bug } from "lucide-react";
-import type { WordData, SupportsUsed, CoachingResponse } from "@/lib/api";
+import type { WordData, SupportsUsed, CoachingResponse, CustomListSummary } from "@/lib/api";
+import type { PracticeMode } from "@/components/PracticeModeSwitch";
 
 interface DebugPanelProps {
   level: number;
   wordData: WordData | null;
   supports: SupportsUsed;
   response: CoachingResponse | null;
+  practiceMode?: PracticeMode;
+  selectedCustomList?: CustomListSummary | null;
+  customPracticeActive?: boolean;
 }
 
-export function DebugPanel({ level, wordData, supports, response }: DebugPanelProps) {
+export function DebugPanel({ level, wordData, supports, response, practiceMode, selectedCustomList, customPracticeActive }: DebugPanelProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,7 +27,14 @@ export function DebugPanel({ level, wordData, supports, response }: DebugPanelPr
       </button>
       {open && (
         <div className="mt-2 rounded-lg bg-foreground/5 p-3 text-xs font-mono space-y-2 overflow-x-auto">
+          <div><strong>Practice Mode:</strong> {practiceMode ?? "standard"}</div>
           <div><strong>Level:</strong> {level}</div>
+          {selectedCustomList && (
+            <div>
+              <strong>Custom List:</strong> {selectedCustomList.name} (id: {selectedCustomList.id}, level: {selectedCustomList.level}, words: {selectedCustomList.wordCount})
+              <br /><strong>Custom Practice Active:</strong> {String(!!customPracticeActive)}
+            </div>
+          )}
           <div>
             <strong>Word Meta:</strong>
             <pre className="mt-1 whitespace-pre-wrap">{JSON.stringify(wordData, null, 2)}</pre>

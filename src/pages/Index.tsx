@@ -7,8 +7,10 @@ import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
 import { DebugPanel } from "@/components/DebugPanel";
 import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
+import { PracticeModeSwitch, type PracticeMode } from "@/components/PracticeModeSwitch";
+import { CustomListPanel } from "@/components/CustomListPanel";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
-import type { WordData, CoachingResponse, SupportsUsed, SessionContext } from "@/lib/api";
+import type { WordData, CoachingResponse, SupportsUsed, SessionContext, CustomListSummary } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import beePng from "@/assets/bee.png";
 
@@ -37,7 +39,6 @@ export default function Index() {
   const [exOpen, setExOpen] = useState(false);
   const [origOpen, setOrigOpen] = useState(false);
 
-  // Track if support was opened at any point before submission
   const supportsViewed = useRef<SupportsUsed>({ definitionViewed: false, exampleViewed: false, originViewed: false });
 
   const [session, setSession] = useState<SessionContext>({
@@ -47,13 +48,32 @@ export default function Index() {
     recentlyPracticedWords: [],
   });
 
+  // Practice mode & custom list state
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>("standard");
+  const [selectedCustomList, setSelectedCustomList] = useState<CustomListSummary | null>(null);
+  const [customPracticeActive, setCustomPracticeActive] = useState(false);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme === "default" ? "" : theme);
   }, [theme]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const loadWord = useCallback(async (lvl: number) => {
+  const resetWordState = () => {
+    setWord(null);
+    setResult(null);
+    setAttempt("");
+    setDefOpen(false);
+    setExOpen(false);
+    setOrigOpen(false);
+    setAudioError(null);
+    setError(null);
+    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+    supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
+    setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
+  };
+
+  const loadWord = useCallback(async (lvl: number, customListId?: string) => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -66,7 +86,7 @@ export default function Index() {
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
     try {
-      const w = await fetchNextWord(lvl);
+      const w = await fetchNextWord(lvl, customListId);
       setWord(w);
     } catch {
       setError("Could not load word. Check your connection.");
@@ -79,6 +99,18 @@ export default function Index() {
   const handleLevelChange = (lvl: number) => {
     setLevel(lvl);
     loadWord(lvl);
+  };
+
+  const handleModeChange = (mode: PracticeMode) => {
+    setPracticeMode(mode);
+    resetWordState();
+    setCustomPracticeActive(false);
+  };
+
+  const handleStartCustomPractice = () => {
+    if (!selectedCustomList) return;
+    setCustomPracticeActive(true);
+    loadWord(Number(selectedCustomList.level), selectedCustomList.id);
   };
 
   const handleSubmit = async () => {
@@ -107,7 +139,13 @@ export default function Index() {
     }
   };
 
-  const handleNextWord = () => loadWord(level);
+  const handleNextWord = () => {
+    if (practiceMode === "custom" && customPracticeActive && selectedCustomList) {
+      loadWord(Number(selectedCustomList.level), selectedCustomList.id);
+    } else {
+      loadWord(level);
+    }
+  };
 
   const playPronunciation = async () => {
     if (!word || audioLoading) return;
@@ -133,19 +171,23 @@ export default function Index() {
   const hasWord = !!word && !loading;
   const submitted = !!result;
 
+  const showStandardFlow = practiceMode === "standard";
+  const showCustomSetup = practiceMode === "custom" && !customPracticeActive;
+  const showPractice = showStandardFlow || (practiceMode === "custom" && customPracticeActive);
+
   return (
     <div className="min-h-screen">
       <div className="mx-auto max-w-lg px-4 py-6 sm:py-10">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1" />
-           <div className="text-center flex items-center justify-center gap-2">
-             <img src={beePng} alt="Spelling bee mascot" className="h-12 w-auto -mr-1" />
-             <div>
-               <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
-               <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
-             </div>
-           </div>
+          <div className="text-center flex items-center justify-center gap-2">
+            <img src={beePng} alt="Spelling bee mascot" className="h-12 w-auto -mr-1" />
+            <div>
+              <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
+              <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
+            </div>
+          </div>
           <div className="flex-1 flex items-center justify-end gap-1">
             <button
               onClick={toggleSound}
@@ -158,37 +200,71 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Level Selector */}
-        <div className="mb-6">
-          <LevelSelector selected={level} onSelect={handleLevelChange} />
+        {/* Practice Mode Switch */}
+        <div className="mb-4">
+          <PracticeModeSwitch mode={practiceMode} onChange={handleModeChange} />
         </div>
 
-        {/* Start prompt */}
-        {!word && !loading && !error && (
+        {/* Custom List Setup */}
+        {showCustomSetup && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+            <CustomListPanel
+              selectedList={selectedCustomList}
+              onSelectList={setSelectedCustomList}
+              onStartPractice={handleStartCustomPractice}
+            />
+          </motion.div>
+        )}
+
+        {/* Active custom list banner */}
+        {practiceMode === "custom" && customPracticeActive && selectedCustomList && (
+          <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5">
+            <div>
+              <p className="text-sm font-semibold text-foreground">{selectedCustomList.name}</p>
+              <p className="text-[10px] text-muted-foreground">Level {selectedCustomList.level} · {selectedCustomList.wordCount} words</p>
+            </div>
+            <button
+              onClick={() => { setCustomPracticeActive(false); resetWordState(); }}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Change List
+            </button>
+          </div>
+        )}
+
+        {/* Standard: Level Selector */}
+        {showStandardFlow && (
+          <div className="mb-6">
+            <LevelSelector selected={level} onSelect={handleLevelChange} />
+          </div>
+        )}
+
+        {/* Start prompt (standard mode only) */}
+        {showStandardFlow && !word && !loading && !error && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
             <p className="text-muted-foreground mb-4">Choose a level above to begin.</p>
           </motion.div>
         )}
 
         {/* Loading */}
-        {loading && (
+        {showPractice && loading && (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         )}
 
         {/* Error */}
-        {error && (
+        {showPractice && error && (
           <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-4 text-center text-sm text-destructive mb-4">
             {error}
-            <button onClick={() => loadWord(level)} className="block mx-auto mt-2 underline text-xs">
+            <button onClick={handleNextWord} className="block mx-auto mt-2 underline text-xs">
               Retry
             </button>
           </div>
         )}
 
         {/* Word Practice Area */}
-        {hasWord && (
+        {showPractice && hasWord && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             {/* Pronounce Word Button */}
             <div className="flex flex-col items-center gap-2">
@@ -201,16 +277,10 @@ export default function Index() {
                   "shadow-md hover:shadow-lg"
                 )}
               >
-                {audioLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  <Volume2 className="h-6 w-6" />
-                )}
+                {audioLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Volume2 className="h-6 w-6" />}
                 {audioLoading ? "Loading…" : "Hear the Word"}
               </button>
-              {audioError && (
-                <p className="text-xs text-destructive">{audioError}</p>
-              )}
+              {audioError && <p className="text-xs text-destructive">{audioError}</p>}
             </div>
 
             {/* Word metadata bar */}
@@ -273,7 +343,6 @@ export default function Index() {
             {/* Results */}
             {submitted && result && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                {/* Attempt vs Correct comparison */}
                 {word && (
                   <div className="rounded-xl border-2 border-border bg-card p-4 text-center space-y-1">
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your spelling</p>
@@ -309,6 +378,9 @@ export default function Index() {
           wordData={word}
           supports={supportsViewed.current}
           response={result}
+          practiceMode={practiceMode}
+          selectedCustomList={selectedCustomList}
+          customPracticeActive={customPracticeActive}
         />
       </div>
     </div>

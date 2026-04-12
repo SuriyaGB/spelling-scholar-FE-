@@ -107,34 +107,8 @@ export function CoachingResult({ result }: CoachingResultProps) {
         </motion.div>
       )}
 
-      {/* What Matters Most For This Error */}
-      {errorRelevance && (
-        <Section icon={Target} title="What Matters Most For This Error">
-          <div className="flex items-center gap-2 mb-2">
-            <span className={cn(
-              "rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
-              relevanceBadgeStyle[errorRelevance.mostRelevantToError] || relevanceBadgeStyle.unclear
-            )}>
-              {errorRelevance.mostRelevantToError}
-            </span>
-          </div>
-          <ConfidenceBar confidence={errorRelevance.confidence} label="Confidence" />
-          {errorRelevance.reason && <p className="mt-2 text-xs text-muted-foreground">{errorRelevance.reason}</p>}
-        </Section>
-      )}
-
-      {/* Teaching Decision */}
-      <Section icon={Brain} title="Teaching Decision">
-        <p className="font-medium text-primary">{teachingDecision.primaryFocus}</p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-xs rounded-full bg-primary/10 text-primary px-2 py-0.5 font-medium capitalize">{teachingDecision.strategy}</span>
-          {teachingDecision.secondaryFocuses?.length > 0 && (
-            <LabelChips labels={teachingDecision.secondaryFocuses} variant="default" />
-          )}
-        </div>
-        <ConfidenceBar confidence={teachingDecision.confidence} label="Confidence" className="mt-2" />
-        <p className="text-xs text-muted-foreground mt-1.5">{teachingDecision.rationale}</p>
-      </Section>
+      {/* What Matters Most For This Error - hidden for cleaner UX */}
+      {/* Teaching Decision - hidden for cleaner UX */}
 
       {/* Explanation */}
       <Section icon={BookOpen} title="Explanation">

@@ -332,16 +332,16 @@ export default function Index() {
               <SupportCard
                 type="definition"
                 content={word.definition}
-                isOpen={!submitted && defOpen}
+                isOpen={defOpen}
                 onToggle={toggleDef}
               />
               <SupportCard
                 type="example"
                 content={word.exampleSentence}
-                isOpen={!submitted && exOpen}
+                isOpen={exOpen}
                 onToggle={toggleEx}
               />
-              <SupportCard type="origin" content={word.origin} isOpen={!submitted && origOpen} onToggle={toggleOrig} />
+              <SupportCard type="origin" content={word.origin} isOpen={origOpen} onToggle={toggleOrig} />
             </div>
 
             {/* Input Area */}

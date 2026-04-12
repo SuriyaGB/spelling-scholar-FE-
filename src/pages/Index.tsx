@@ -68,7 +68,10 @@ export default function Index() {
     setOrigOpen(false);
     setAudioError(null);
     setError(null);
-    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
   };
@@ -82,7 +85,10 @@ export default function Index() {
     setExOpen(false);
     setOrigOpen(false);
     setAudioError(null);
-    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
     try {
@@ -164,9 +170,18 @@ export default function Index() {
     }
   };
 
-  const toggleDef = () => { setDefOpen((v) => !v); supportsViewed.current.definitionViewed = true; };
-  const toggleEx = () => { setExOpen((v) => !v); supportsViewed.current.exampleViewed = true; };
-  const toggleOrig = () => { setOrigOpen((v) => !v); supportsViewed.current.originViewed = true; };
+  const toggleDef = () => {
+    setDefOpen((v) => !v);
+    supportsViewed.current.definitionViewed = true;
+  };
+  const toggleEx = () => {
+    setExOpen((v) => !v);
+    supportsViewed.current.exampleViewed = true;
+  };
+  const toggleOrig = () => {
+    setOrigOpen((v) => !v);
+    supportsViewed.current.originViewed = true;
+  };
 
   const hasWord = !!word && !loading;
   const submitted = !!result;
@@ -182,7 +197,7 @@ export default function Index() {
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1" />
           <div className="text-center flex items-center justify-center gap-2">
-            <img src={beePng} alt="Spelling bee mascot" className="h-20 w-auto -mr-2" />
+            <img src={beePng} alt="Spelling bee mascot" className="h-30 w-auto -mr-2" />
             <div>
               <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
               <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
@@ -221,10 +236,15 @@ export default function Index() {
           <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5">
             <div>
               <p className="text-sm font-semibold text-foreground">{selectedCustomList.name}</p>
-              <p className="text-[10px] text-muted-foreground">Level {selectedCustomList.level} · {selectedCustomList.wordCount} words</p>
+              <p className="text-[10px] text-muted-foreground">
+                Level {selectedCustomList.level} · {selectedCustomList.wordCount} words
+              </p>
             </div>
             <button
-              onClick={() => { setCustomPracticeActive(false); resetWordState(); }}
+              onClick={() => {
+                setCustomPracticeActive(false);
+                resetWordState();
+              }}
               className="text-xs font-medium text-primary hover:underline"
             >
               Change List
@@ -274,7 +294,7 @@ export default function Index() {
                 className={cn(
                   "flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold text-lg transition-all",
                   "bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed",
-                  "shadow-md hover:shadow-lg"
+                  "shadow-md hover:shadow-lg",
                 )}
               >
                 {audioLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Volume2 className="h-6 w-6" />}
@@ -288,12 +308,16 @@ export default function Index() {
               <span className="text-xs rounded-full bg-primary/10 text-primary px-2.5 py-1 font-medium">
                 Level {word.level}
               </span>
-              <span className={cn(
-                "text-xs rounded-full px-2.5 py-1 font-medium",
-                word.difficulty === "easy" ? "bg-success/10 text-success"
-                  : word.difficulty === "medium" ? "bg-warning/10 text-warning"
-                  : "bg-destructive/10 text-destructive"
-              )}>
+              <span
+                className={cn(
+                  "text-xs rounded-full px-2.5 py-1 font-medium",
+                  word.difficulty === "easy"
+                    ? "bg-success/10 text-success"
+                    : word.difficulty === "medium"
+                      ? "bg-warning/10 text-warning"
+                      : "bg-destructive/10 text-destructive",
+                )}
+              >
                 {word.difficulty}
               </span>
               <span className="text-xs rounded-full bg-chip-accent text-chip-accent-foreground px-2.5 py-1 font-medium">
@@ -303,14 +327,20 @@ export default function Index() {
 
             {/* Support Buttons */}
             <div className="space-y-2">
-              {!submitted && (
-                <p className="text-xs text-muted-foreground text-center">Need a hint? Tap for clues:</p>
-              )}
-              {submitted && (
-                <p className="text-xs text-muted-foreground text-center">Review word details:</p>
-              )}
-              <SupportCard type="definition" content={word.definition} isOpen={!submitted && defOpen} onToggle={toggleDef} />
-              <SupportCard type="example" content={word.exampleSentence} isOpen={!submitted && exOpen} onToggle={toggleEx} />
+              {!submitted && <p className="text-xs text-muted-foreground text-center">Need a hint? Tap for clues:</p>}
+              {submitted && <p className="text-xs text-muted-foreground text-center">Review word details:</p>}
+              <SupportCard
+                type="definition"
+                content={word.definition}
+                isOpen={!submitted && defOpen}
+                onToggle={toggleDef}
+              />
+              <SupportCard
+                type="example"
+                content={word.exampleSentence}
+                isOpen={!submitted && exOpen}
+                onToggle={toggleEx}
+              />
               <SupportCard type="origin" content={word.origin} isOpen={!submitted && origOpen} onToggle={toggleOrig} />
             </div>
 
@@ -334,7 +364,7 @@ export default function Index() {
                   disabled={!attempt.trim() || submitting}
                   className={cn(
                     "w-full flex items-center justify-center gap-2 rounded-xl py-3.5 font-semibold text-base transition-all",
-                    "bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+                    "bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed",
                   )}
                 >
                   {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
@@ -349,15 +379,19 @@ export default function Index() {
                 {word && (
                   <div className="rounded-xl border-2 border-border bg-card p-4 text-center space-y-1">
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your spelling</p>
-                    <p className={cn(
-                      "text-2xl font-display tracking-widest",
-                      result.correctness.isCorrect ? "text-success" : "text-destructive line-through decoration-2"
-                    )}>
+                    <p
+                      className={cn(
+                        "text-2xl font-display tracking-widest",
+                        result.correctness.isCorrect ? "text-success" : "text-destructive line-through decoration-2",
+                      )}
+                    >
                       {attempt}
                     </p>
                     {!result.correctness.isCorrect && (
                       <>
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide pt-2">Correct spelling</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide pt-2">
+                          Correct spelling
+                        </p>
                         <p className="text-2xl font-display tracking-widest text-success">{word.word}</p>
                       </>
                     )}

@@ -302,14 +302,17 @@ export default function Index() {
             </div>
 
             {/* Support Buttons */}
-            {!submitted && (
-              <div className="space-y-2">
+            <div className="space-y-2">
+              {!submitted && (
                 <p className="text-xs text-muted-foreground text-center">Need a hint? Tap for clues:</p>
-                <SupportCard type="definition" content={word.definition} isOpen={defOpen} onToggle={toggleDef} />
-                <SupportCard type="example" content={word.exampleSentence} isOpen={exOpen} onToggle={toggleEx} />
-                <SupportCard type="origin" content={word.origin} isOpen={origOpen} onToggle={toggleOrig} />
-              </div>
-            )}
+              )}
+              {submitted && (
+                <p className="text-xs text-muted-foreground text-center">Review word details:</p>
+              )}
+              <SupportCard type="definition" content={word.definition} isOpen={!submitted && defOpen} onToggle={toggleDef} />
+              <SupportCard type="example" content={word.exampleSentence} isOpen={!submitted && exOpen} onToggle={toggleEx} />
+              <SupportCard type="origin" content={word.origin} isOpen={!submitted && origOpen} onToggle={toggleOrig} />
+            </div>
 
             {/* Input Area */}
             {!submitted && (

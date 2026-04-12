@@ -197,7 +197,7 @@ export default function Index() {
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1" />
           <div className="text-center flex items-center justify-center gap-2">
-            <img src={beePng} alt="Spelling bee mascot" className="h-20 w-auto -mr-2" />
+            <img src={beePng} alt="Spelling bee mascot" className="h-18 w-auto -mr-2" />
             <div>
               <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
               <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>

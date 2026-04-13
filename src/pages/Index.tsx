@@ -116,7 +116,7 @@ export default function Index() {
   const handleStartCustomPractice = () => {
     if (!selectedCustomList) return;
     setCustomPracticeActive(true);
-    loadWord(Number(selectedCustomList.level), selectedCustomList.id);
+    loadWord(undefined, selectedCustomList.id);
   };
 
   const handleSubmit = async () => {
@@ -147,7 +147,7 @@ export default function Index() {
 
   const handleNextWord = () => {
     if (practiceMode === "custom" && customPracticeActive && selectedCustomList) {
-      loadWord(Number(selectedCustomList.level), selectedCustomList.id);
+      loadWord(undefined, selectedCustomList.id);
     } else {
       loadWord(level);
     }

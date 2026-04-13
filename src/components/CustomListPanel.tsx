@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, Upload, List, Check, BookOpen } from "lucide-react";
+import { Loader2, Upload, List, Check, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fetchCustomLists, importCustomWordList } from "@/lib/api";
-import type { CustomListSummary, ImportCustomListResponse } from "@/lib/api";
+import { fetchCustomLists, importCustomWordList, fetchCustomListWords } from "@/lib/api";
+import type { CustomListSummary, ImportCustomListResponse, WordData } from "@/lib/api";
 
 interface CustomListPanelProps {
   selectedList: CustomListSummary | null;
@@ -17,13 +17,17 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
 
   // Import form
   const [listName, setListName] = useState("");
-  const [importLevel, setImportLevel] = useState("1");
   const [wordsText, setWordsText] = useState("");
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importResult, setImportResult] = useState<ImportCustomListResponse | null>(null);
 
   const [showImport, setShowImport] = useState(false);
+
+  // Words in selected list
+  const [listWords, setListWords] = useState<WordData[]>([]);
+  const [wordsLoading, setWordsLoading] = useState(false);
+  const [showWords, setShowWords] = useState(false);
 
   const loadLists = useCallback(async () => {
     setListsLoading(true);
@@ -40,6 +44,33 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
 
   useEffect(() => { loadLists(); }, [loadLists]);
 
+  // Load words when a list is selected and user wants to see them
+  const loadListWords = useCallback(async (listId: string) => {
+    setWordsLoading(true);
+    try {
+      const words = await fetchCustomListWords(listId);
+      setListWords(words);
+    } catch {
+      setListWords([]);
+    } finally {
+      setWordsLoading(false);
+    }
+  }, []);
+
+  const handleToggleWords = () => {
+    if (!selectedList) return;
+    if (!showWords && listWords.length === 0) {
+      loadListWords(selectedList.id);
+    }
+    setShowWords((v) => !v);
+  };
+
+  // Reset words view when list changes
+  useEffect(() => {
+    setShowWords(false);
+    setListWords([]);
+  }, [selectedList?.id]);
+
   const handleImport = async () => {
     if (!listName.trim() || !wordsText.trim()) return;
     setImporting(true);
@@ -54,7 +85,6 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
       const res = await importCustomWordList({
         listName: listName.trim(),
         words,
-        level: importLevel,
         overwriteList: true,
       });
       setImportResult(res);
@@ -113,7 +143,7 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
                   <BookOpen className={cn("h-4 w-4 shrink-0", isSelected ? "text-primary" : "text-muted-foreground")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{list.name}</p>
-                    <p className="text-[10px] text-muted-foreground">Level {list.level} · {list.wordCount} words</p>
+                    <p className="text-[10px] text-muted-foreground">{list.wordCount} words</p>
                   </div>
                   {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
                 </button>
@@ -123,12 +153,48 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
         )}
 
         {selectedList && (
-          <button
-            onClick={onStartPractice}
-            className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl py-3 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-          >
-            Practice "{selectedList.name}"
-          </button>
+          <div className="mt-3 space-y-2">
+            <button
+              onClick={handleToggleWords}
+              className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium border border-border bg-card hover:border-primary/30 transition-all"
+            >
+              <span className="flex items-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                View Words
+              </span>
+              {showWords ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </button>
+
+            {showWords && (
+              <div className="rounded-lg border border-border bg-card p-3 max-h-40 overflow-y-auto">
+                {wordsLoading ? (
+                  <div className="flex justify-center py-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  </div>
+                ) : listWords.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {listWords.map((w, i) => (
+                      <span
+                        key={i}
+                        className="inline-block rounded-md bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium"
+                      >
+                        {w.word}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center">No words found.</p>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={onStartPractice}
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+            >
+              Practice "{selectedList.name}"
+            </button>
+          </div>
         )}
       </div>
 
@@ -146,26 +212,6 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
               placeholder="e.g. Wind Words"
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
-          </div>
-
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1">Level</label>
-            <div className="flex gap-1.5">
-              {["1", "2", "3"].map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setImportLevel(l)}
-                  className={cn(
-                    "flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold border transition-all",
-                    importLevel === l
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:border-primary/40"
-                  )}
-                >
-                  Level {l}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div>

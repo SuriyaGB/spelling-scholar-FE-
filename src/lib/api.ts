@@ -120,7 +120,6 @@ export interface CustomListSummary {
 export interface ImportCustomListRequest {
   listName: string;
   words: string[];
-  level: string;
   overwriteList: boolean;
 }
 
@@ -135,8 +134,9 @@ export interface CustomListsResponse {
   lists: CustomListSummary[];
 }
 
-export async function fetchNextWord(level: number, customListId?: string): Promise<WordData> {
-  const params = new URLSearchParams({ level: String(level) });
+export async function fetchNextWord(level?: number, customListId?: string): Promise<WordData> {
+  const params = new URLSearchParams();
+  if (level != null && !customListId) params.set("level", String(level));
   if (customListId) params.set("customListId", customListId);
   const res = await fetch(`${BASE_URL}/api/words/next?${params}`);
   if (!res.ok) throw new Error("Failed to fetch word");
@@ -146,6 +146,12 @@ export async function fetchNextWord(level: number, customListId?: string): Promi
 export async function fetchCustomLists(): Promise<CustomListsResponse> {
   const res = await fetch(`${BASE_URL}/api/custom-lists`);
   if (!res.ok) throw new Error("Failed to fetch custom lists");
+  return res.json();
+}
+
+export async function fetchCustomListWords(listId: string): Promise<WordData[]> {
+  const res = await fetch(`${BASE_URL}/api/custom-lists/${encodeURIComponent(listId)}`);
+  if (!res.ok) throw new Error("Failed to fetch custom list words");
   return res.json();
 }
 

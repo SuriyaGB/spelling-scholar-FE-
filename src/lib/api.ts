@@ -134,6 +134,12 @@ export interface CustomListsResponse {
   lists: CustomListSummary[];
 }
 
+export interface CustomListDetailResponse {
+  list: CustomListSummary & {
+    words: WordData[];
+  };
+}
+
 export async function fetchNextWord(level?: number, customListId?: string): Promise<WordData> {
   const params = new URLSearchParams();
   if (level != null && !customListId) params.set("level", String(level));
@@ -152,7 +158,13 @@ export async function fetchCustomLists(): Promise<CustomListsResponse> {
 export async function fetchCustomListWords(listId: string): Promise<WordData[]> {
   const res = await fetch(`${BASE_URL}/api/custom-lists/${encodeURIComponent(listId)}`);
   if (!res.ok) throw new Error("Failed to fetch custom list words");
-  return res.json();
+  const data = await res.json();
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.words)) return data.words;
+  if (Array.isArray(data?.list?.words)) return data.list.words;
+
+  return [];
 }
 
 export async function importCustomWordList(payload: ImportCustomListRequest): Promise<ImportCustomListResponse> {

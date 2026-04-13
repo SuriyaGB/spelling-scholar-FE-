@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, Upload, List, Check, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { Loader2, Upload, List, Check, BookOpen, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fetchCustomLists, importCustomWordList, fetchCustomListWords } from "@/lib/api";
 import type { CustomListSummary, ImportCustomListResponse, WordData } from "@/lib/api";
@@ -15,19 +15,17 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
   const [listsLoading, setListsLoading] = useState(false);
   const [listsError, setListsError] = useState<string | null>(null);
 
-  // Import form
   const [listName, setListName] = useState("");
   const [wordsText, setWordsText] = useState("");
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importResult, setImportResult] = useState<ImportCustomListResponse | null>(null);
-
   const [showImport, setShowImport] = useState(false);
 
-  // Words in selected list
-  const [listWords, setListWords] = useState<WordData[]>([]);
-  const [wordsLoading, setWordsLoading] = useState(false);
-  const [showWords, setShowWords] = useState(false);
+  // Track which list is expanded to show words
+  const [expandedListId, setExpandedListId] = useState<string | null>(null);
+  const [listWordsMap, setListWordsMap] = useState<Record<string, WordData[]>>({});
+  const [wordsLoadingId, setWordsLoadingId] = useState<string | null>(null);
 
   const loadLists = useCallback(async () => {
     setListsLoading(true);
@@ -44,32 +42,29 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
 
   useEffect(() => { loadLists(); }, [loadLists]);
 
-  // Load words when a list is selected and user wants to see them
-  const loadListWords = useCallback(async (listId: string) => {
-    setWordsLoading(true);
-    try {
-      const words = await fetchCustomListWords(listId);
-      setListWords(words);
-    } catch {
-      setListWords([]);
-    } finally {
-      setWordsLoading(false);
+  const handleToggleExpand = async (list: CustomListSummary) => {
+    if (expandedListId === list.id) {
+      setExpandedListId(null);
+      return;
     }
-  }, []);
-
-  const handleToggleWords = () => {
-    if (!selectedList) return;
-    if (!showWords && listWords.length === 0) {
-      loadListWords(selectedList.id);
+    setExpandedListId(list.id);
+    // Also select the list
+    onSelectList(list);
+    // Load words if not cached
+    if (!listWordsMap[list.id]) {
+      setWordsLoadingId(list.id);
+      try {
+        const result = await fetchCustomListWords(list.id);
+        // Handle both array response and { words: [] } response
+        const words = Array.isArray(result) ? result : (result as any)?.words || [];
+        setListWordsMap(prev => ({ ...prev, [list.id]: words }));
+      } catch {
+        setListWordsMap(prev => ({ ...prev, [list.id]: [] }));
+      } finally {
+        setWordsLoadingId(null);
+      }
     }
-    setShowWords((v) => !v);
   };
-
-  // Reset words view when list changes
-  useEffect(() => {
-    setShowWords(false);
-    setListWords([]);
-  }, [selectedList?.id]);
 
   const handleImport = async () => {
     if (!listName.trim() || !wordsText.trim()) return;
@@ -100,103 +95,100 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
 
   return (
     <div className="space-y-4">
-      {/* Available Lists */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-            <List className="h-4 w-4" /> Your Word Lists
-          </h3>
-          <button
-            onClick={() => { setShowImport((v) => !v); setImportResult(null); }}
-            className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
-          >
-            <Upload className="h-3 w-3" /> {showImport ? "Hide Import" : "Import New List"}
-          </button>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+          <List className="h-4 w-4" /> Your Word Lists
+        </h3>
+        <button
+          onClick={() => { setShowImport((v) => !v); setImportResult(null); }}
+          className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+        >
+          <Upload className="h-3 w-3" /> {showImport ? "Hide Import" : "Import New List"}
+        </button>
+      </div>
+
+      {listsLoading && (
+        <div className="flex justify-center py-4">
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
         </div>
+      )}
+      {listsError && <p className="text-xs text-destructive">{listsError}</p>}
 
-        {listsLoading && (
-          <div className="flex justify-center py-4">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-          </div>
-        )}
-        {listsError && <p className="text-xs text-destructive">{listsError}</p>}
+      {!listsLoading && lists.length === 0 && !listsError && (
+        <p className="text-xs text-muted-foreground text-center py-4">No custom lists yet. Import one to get started.</p>
+      )}
 
-        {!listsLoading && lists.length === 0 && !listsError && (
-          <p className="text-xs text-muted-foreground text-center py-4">No custom lists yet. Import one to get started.</p>
-        )}
+      {/* List items with inline expand */}
+      {lists.length > 0 && (
+        <div className="space-y-2">
+          {lists.map((list) => {
+            const isSelected = selectedList?.id === list.id;
+            const isExpanded = expandedListId === list.id;
+            const words = listWordsMap[list.id] || [];
+            const isLoadingWords = wordsLoadingId === list.id;
 
-        {lists.length > 0 && (
-          <div className="space-y-1.5">
-            {lists.map((list) => {
-              const isSelected = selectedList?.id === list.id;
-              return (
+            return (
+              <div
+                key={list.id}
+                className={cn(
+                  "rounded-xl border transition-all",
+                  isSelected
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                    : "border-border bg-card"
+                )}
+              >
+                {/* List header row */}
                 <button
-                  key={list.id}
-                  onClick={() => onSelectList(isSelected ? null : list)}
-                  className={cn(
-                    "w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all border",
-                    isSelected
-                      ? "border-primary bg-primary/10 ring-1 ring-primary/20"
-                      : "border-border bg-card hover:border-primary/30"
-                  )}
+                  onClick={() => handleToggleExpand(list)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left"
                 >
-                  <BookOpen className={cn("h-4 w-4 shrink-0", isSelected ? "text-primary" : "text-muted-foreground")} />
+                  {isExpanded
+                    ? <ChevronDown className="h-4 w-4 shrink-0 text-primary" />
+                    : <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  }
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{list.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{list.wordCount} words</p>
+                    <p className="text-[11px] text-muted-foreground">{list.wordCount} words</p>
                   </div>
                   {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
                 </button>
-              );
-            })}
-          </div>
-        )}
 
-        {selectedList && (
-          <div className="mt-3 space-y-2">
-            <button
-              onClick={handleToggleWords}
-              className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium border border-border bg-card hover:border-primary/30 transition-all"
-            >
-              <span className="flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                View Words
-              </span>
-              {showWords ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-            </button>
+                {/* Expanded words section */}
+                {isExpanded && (
+                  <div className="px-4 pb-3 space-y-3">
+                    <div className="border-t border-dashed border-border pt-3">
+                      {isLoadingWords ? (
+                        <div className="flex justify-center py-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        </div>
+                      ) : words.length > 0 ? (
+                        <div>
+                          <p className="text-[11px] text-muted-foreground mb-1.5">
+                            Showing {words.length} of {list.wordCount}
+                          </p>
+                          <p className="text-sm text-foreground">
+                            {words.map(w => w.word).join(", ")}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground text-center">No words found.</p>
+                      )}
+                    </div>
 
-            {showWords && (
-              <div className="rounded-lg border border-border bg-card p-3 max-h-40 overflow-y-auto">
-                {wordsLoading ? (
-                  <div className="flex justify-center py-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <button
+                      onClick={onStartPractice}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+                    >
+                      Practice "{list.name}"
+                    </button>
                   </div>
-                ) : listWords.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {listWords.map((w, i) => (
-                      <span
-                        key={i}
-                        className="inline-block rounded-md bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium"
-                      >
-                        {w.word}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground text-center">No words found.</p>
                 )}
               </div>
-            )}
-
-            <button
-              onClick={onStartPractice}
-              className="w-full flex items-center justify-center gap-2 rounded-xl py-3 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-            >
-              Practice "{selectedList.name}"
-            </button>
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Import Form */}
       {showImport && (

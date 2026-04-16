@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Bug } from "lucide-react";
-import type { WordData, SupportsUsed, CoachingResponse, CustomListSummary } from "@/lib/api";
+import type {
+  WordData,
+  SupportsUsed,
+  CoachingResponse,
+  CustomListSummary,
+  ForeignOriginSummary,
+  ForeignOriginDetail,
+} from "@/lib/api";
 import type { PracticeMode } from "@/components/PracticeModeSwitch";
 
 interface DebugPanelProps {
@@ -11,9 +18,23 @@ interface DebugPanelProps {
   practiceMode?: PracticeMode;
   selectedCustomList?: CustomListSummary | null;
   customPracticeActive?: boolean;
+  selectedForeignOrigin?: ForeignOriginSummary | null;
+  selectedForeignOriginDetails?: ForeignOriginDetail | null;
+  foreignPracticeActive?: boolean;
 }
 
-export function DebugPanel({ level, wordData, supports, response, practiceMode, selectedCustomList, customPracticeActive }: DebugPanelProps) {
+export function DebugPanel({
+  level,
+  wordData,
+  supports,
+  response,
+  practiceMode,
+  selectedCustomList,
+  customPracticeActive,
+  selectedForeignOrigin,
+  selectedForeignOriginDetails,
+  foreignPracticeActive,
+}: DebugPanelProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -33,6 +54,17 @@ export function DebugPanel({ level, wordData, supports, response, practiceMode, 
             <div>
               <strong>Custom List:</strong> {selectedCustomList.name} (id: {selectedCustomList.id}, level: {selectedCustomList.level}, words: {selectedCustomList.wordCount})
               <br /><strong>Custom Practice Active:</strong> {String(!!customPracticeActive)}
+            </div>
+          )}
+          {selectedForeignOrigin && (
+            <div>
+              <strong>Foreign Origin:</strong> {selectedForeignOrigin.origin} ({selectedForeignOrigin.wordCount} words)
+              <br /><strong>Foreign Practice Active:</strong> {String(!!foreignPracticeActive)}
+              {selectedForeignOriginDetails && (
+                <>
+                  <br /><strong>Origin Preview Loaded:</strong> {selectedForeignOriginDetails.words?.length ?? 0} words
+                </>
+              )}
             </div>
           )}
           <div>

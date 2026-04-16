@@ -129,7 +129,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Welcome heading */}
-      <div className="text-center space-y-2">
+      <div className="text-left space-y-2">
         <h2 className="text-2xl sm:text-3xl font-display text-foreground tracking-tight">
           What will you practice today?
         </h2>

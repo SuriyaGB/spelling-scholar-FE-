@@ -275,15 +275,14 @@ export default function Index() {
       <div className="mx-auto max-w-lg px-4 py-6 sm:py-10">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
-          <div className="flex-1" />
-          <div className="text-center flex items-center justify-center gap-2">
-            <img src={beePng} alt="Spelling bee mascot" className="h-20 w-auto -mr-2" />
-            <div>
+          <div className="flex items-center gap-2">
+            <img src={beePng} alt="Spelling bee mascot" className="h-20 w-auto" />
+            <div className="text-left">
               <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
               <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-end gap-1">
+          <div className="flex items-center justify-end gap-1">
             <button
               onClick={toggleSound}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

@@ -77,49 +77,22 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     onClick: () => onSelectChannel({ kind: "standard" }),
   });
 
-  // Custom lists — one card per list
-  customLists.forEach((list, i) => {
-    const tone = pastelClasses[i % pastelClasses.length];
-    cards.push({
-      key: `list-${list.id}`,
-      title: list.name,
-      subtitle: `${list.wordCount} words`,
-      Icon: BookOpen,
-      bgClass: tone.bg,
-      iconColorClass: tone.icon,
-      onClick: () => onSelectChannel({ kind: "customList", list }),
-    });
-  });
-
-  // "Manage lists" entry — lets users import / browse lists
+  // "My Lists" entry — opens the list management/selection screen
   cards.push({
     key: "custom-manage",
     title: "My Lists",
-    subtitle: customLists.length > 0 ? "Manage & import" : "Import a new list",
+    subtitle: customLists.length > 0 ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}` : "Import a new list",
     Icon: BookOpen,
     bgClass: "bg-[hsl(var(--channel-warm))]",
     iconColorClass: "text-secondary",
     onClick: () => onSelectChannel({ kind: "customManage" }),
   });
 
-  // Foreign origins — one card per origin
-  origins.forEach((origin, i) => {
-    const tone = pastelClasses[(i + 1) % pastelClasses.length];
-    cards.push({
-      key: `origin-${origin.origin}`,
-      title: `${origin.origin} Words`,
-      subtitle: `${origin.wordCount} words`,
-      Icon: Globe,
-      bgClass: tone.bg,
-      iconColorClass: tone.icon,
-      onClick: () => onSelectChannel({ kind: "foreignOrigin", origin }),
-    });
-  });
-
+  // "Foreign Origins" entry — opens the origin browse screen
   cards.push({
     key: "foreign-manage",
     title: "Foreign Origins",
-    subtitle: origins.length > 0 ? "Browse all origins" : "Explore by language",
+    subtitle: origins.length > 0 ? `${origins.length} language${origins.length === 1 ? "" : "s"}` : "Explore by language",
     Icon: Globe,
     bgClass: "bg-[hsl(var(--channel-purple))]",
     iconColorClass: "text-accent",

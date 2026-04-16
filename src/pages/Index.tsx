@@ -7,9 +7,11 @@ import { SupportCard } from "@/components/SupportCard";
 import { CoachingResult } from "@/components/CoachingResult";
 import { DebugPanel } from "@/components/DebugPanel";
 import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
-import { PracticeModeSwitch, type PracticeMode } from "@/components/PracticeModeSwitch";
+import { type PracticeMode } from "@/components/PracticeModeSwitch";
 import { CustomListPanel } from "@/components/CustomListPanel";
 import { ForeignOriginPanel } from "@/components/ForeignOriginPanel";
+import { ChannelsDashboard } from "@/components/ChannelsDashboard";
+import { ArrowLeft, GraduationCap, List as ListIcon, Globe } from "lucide-react";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type {
   WordData,

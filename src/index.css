@@ -118,6 +118,10 @@
 
     --chip-warm: 45 50% 90%;
     --chip-warm-foreground: 45 55% 32%;
+
+    --channel-green: 152 40% 80%;
+    --channel-warm: 30 60% 82%;
+    --channel-purple: 340 35% 85%;
   }
 
   /* ── Bright & Playful ── */
@@ -169,6 +173,10 @@
 
     --chip-warm: 48 60% 88%;
     --chip-warm-foreground: 48 70% 30%;
+
+    --channel-green: 145 50% 80%;
+    --channel-warm: 48 70% 80%;
+    --channel-purple: 220 55% 84%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Baloo 2', sans-serif;
@@ -224,6 +232,10 @@
     --chip-warm: 35 45% 90%;
     --chip-warm-foreground: 35 55% 32%;
 
+    --channel-green: 145 45% 78%;
+    --channel-warm: 35 55% 80%;
+    --channel-purple: 195 45% 82%;
+
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Baloo 2', sans-serif;
   }
@@ -277,6 +289,10 @@
 
     --chip-warm: 320 25% 22%;
     --chip-warm-foreground: 320 60% 72%;
+
+    --channel-green: 160 40% 24%;
+    --channel-warm: 45 45% 22%;
+    --channel-purple: 270 35% 26%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Baloo 2', sans-serif;
@@ -332,6 +348,10 @@
     --chip-warm: 165 30% 90%;
     --chip-warm-foreground: 165 45% 32%;
 
+    --channel-green: 155 40% 82%;
+    --channel-warm: 310 40% 85%;
+    --channel-purple: 260 40% 85%;
+
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Baloo 2', sans-serif;
   }
@@ -385,6 +405,10 @@
 
     --chip-warm: 48 55% 84%;
     --chip-warm-foreground: 48 60% 28%;
+
+    --channel-green: 90 40% 78%;
+    --channel-warm: 40 65% 78%;
+    --channel-purple: 30 50% 80%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Baloo 2', sans-serif;

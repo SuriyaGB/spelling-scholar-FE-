@@ -60,7 +60,8 @@ export default function Index() {
     recentlyPracticedWords: [],
   });
 
-  // Practice mode & custom list state
+  // Channel / mode state. activeChannel = null means show the dashboard.
+  const [activeChannel, setActiveChannel] = useState<PracticeMode | null>(null);
   const [practiceMode, setPracticeMode] = useState<PracticeMode>("standard");
   const [selectedCustomList, setSelectedCustomList] = useState<CustomListSummary | null>(null);
   const [customPracticeActive, setCustomPracticeActive] = useState(false);
@@ -124,11 +125,19 @@ export default function Index() {
     loadWord({ level: lvl });
   };
 
-  const handleModeChange = (mode: PracticeMode) => {
+  const handleSelectChannel = (mode: PracticeMode) => {
     setPracticeMode(mode);
+    setActiveChannel(mode);
     resetWordState();
     setCustomPracticeActive(false);
     setForeignPracticeActive(false);
+  };
+
+  const handleBackToDashboard = () => {
+    setActiveChannel(null);
+    setCustomPracticeActive(false);
+    setForeignPracticeActive(false);
+    resetWordState();
   };
 
   const handleStartCustomPractice = () => {

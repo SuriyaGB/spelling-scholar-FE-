@@ -54,8 +54,12 @@
     --chip-warm: 35 50% 92%;
     --chip-warm-foreground: 35 60% 36%;
 
-    --font-display: 'DM Serif Display', serif;
+    --font-display: 'Fredoka', sans-serif;
     --font-body: 'DM Sans', sans-serif;
+
+    --channel-green: 152 45% 82%;
+    --channel-warm: 35 65% 84%;
+    --channel-purple: 250 45% 86%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

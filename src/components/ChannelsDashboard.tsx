@@ -72,7 +72,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     title: "Standard Practice",
     subtitle: "Words by level",
     Icon: GraduationCap,
-    bgClass: "bg-primary/10",
+    bgClass: "bg-[hsl(var(--channel-green))]",
     iconColorClass: "text-primary",
     onClick: () => onSelectChannel({ kind: "standard" }),
   });
@@ -97,7 +97,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     title: "My Lists",
     subtitle: customLists.length > 0 ? "Manage & import" : "Import a new list",
     Icon: BookOpen,
-    bgClass: "bg-secondary/15",
+    bgClass: "bg-[hsl(var(--channel-warm))]",
     iconColorClass: "text-secondary",
     onClick: () => onSelectChannel({ kind: "customManage" }),
   });
@@ -116,13 +116,12 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     });
   });
 
-  // "Browse all origins" entry
   cards.push({
     key: "foreign-manage",
     title: "Foreign Origins",
     subtitle: origins.length > 0 ? "Browse all origins" : "Explore by language",
     Icon: Globe,
-    bgClass: "bg-accent/15",
+    bgClass: "bg-[hsl(var(--channel-purple))]",
     iconColorClass: "text-accent",
     onClick: () => onSelectChannel({ kind: "foreignManage" }),
   });

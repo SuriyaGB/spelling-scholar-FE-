@@ -10,7 +10,7 @@ import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
 import { type PracticeMode } from "@/components/PracticeModeSwitch";
 import { CustomListPanel } from "@/components/CustomListPanel";
 import { ForeignOriginPanel } from "@/components/ForeignOriginPanel";
-import { ChannelsDashboard } from "@/components/ChannelsDashboard";
+import { ChannelsDashboard, type ChannelSelection } from "@/components/ChannelsDashboard";
 import { ArrowLeft, GraduationCap, List as ListIcon, Globe } from "lucide-react";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
 import type {
@@ -125,12 +125,39 @@ export default function Index() {
     loadWord({ level: lvl });
   };
 
-  const handleSelectChannel = (mode: PracticeMode) => {
-    setPracticeMode(mode);
-    setActiveChannel(mode);
+  const handleSelectChannel = (selection: ChannelSelection) => {
     resetWordState();
     setCustomPracticeActive(false);
     setForeignPracticeActive(false);
+
+    switch (selection.kind) {
+      case "standard":
+        setPracticeMode("standard");
+        setActiveChannel("standard");
+        break;
+      case "customManage":
+        setPracticeMode("custom");
+        setActiveChannel("custom");
+        break;
+      case "customList":
+        setPracticeMode("custom");
+        setActiveChannel("custom");
+        setSelectedCustomList(selection.list);
+        setCustomPracticeActive(true);
+        loadWord({ customListId: selection.list.id });
+        break;
+      case "foreignManage":
+        setPracticeMode("foreignOrigin");
+        setActiveChannel("foreignOrigin");
+        break;
+      case "foreignOrigin":
+        setPracticeMode("foreignOrigin");
+        setActiveChannel("foreignOrigin");
+        setSelectedForeignOrigin(selection.origin);
+        setForeignPracticeActive(true);
+        loadWord({ foreignOrigin: selection.origin.origin });
+        break;
+    }
   };
 
   const handleBackToDashboard = () => {

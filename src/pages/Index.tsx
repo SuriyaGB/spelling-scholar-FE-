@@ -228,13 +228,20 @@ export default function Index() {
   const hasWord = !!word && !loading;
   const submitted = !!result;
 
-  const showStandardFlow = practiceMode === "standard";
-  const showCustomSetup = practiceMode === "custom" && !customPracticeActive;
-  const showForeignSetup = practiceMode === "foreignOrigin" && !foreignPracticeActive;
+  const showDashboard = activeChannel === null;
+  const showStandardFlow = activeChannel === "standard";
+  const showCustomSetup = activeChannel === "custom" && !customPracticeActive;
+  const showForeignSetup = activeChannel === "foreignOrigin" && !foreignPracticeActive;
   const showPractice =
     showStandardFlow ||
-    (practiceMode === "custom" && customPracticeActive) ||
-    (practiceMode === "foreignOrigin" && foreignPracticeActive);
+    (activeChannel === "custom" && customPracticeActive) ||
+    (activeChannel === "foreignOrigin" && foreignPracticeActive);
+
+  const channelLabels: Record<PracticeMode, { label: string; Icon: typeof GraduationCap }> = {
+    standard: { label: "Standard Practice", Icon: GraduationCap },
+    custom: { label: "Custom Lists", Icon: ListIcon },
+    foreignOrigin: { label: "Foreign Origin", Icon: Globe },
+  };
 
   return (
     <div className="min-h-screen">
@@ -261,10 +268,33 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Practice Mode Switch */}
-        <div className="mb-4">
-          <PracticeModeSwitch mode={practiceMode} onChange={handleModeChange} />
-        </div>
+        {/* Dashboard or active channel header */}
+        {showDashboard ? (
+          <ChannelsDashboard onSelectChannel={handleSelectChannel} />
+        ) : (
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <button
+              onClick={handleBackToDashboard}
+              className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors rounded-lg px-2 py-1.5 hover:bg-accent/30"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All channels
+            </button>
+            {activeChannel && (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                {(() => {
+                  const { Icon, label } = channelLabels[activeChannel];
+                  return (
+                    <>
+                      <Icon className="h-3.5 w-3.5 text-primary" />
+                      {label}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Custom List Setup */}
         {showCustomSetup && (

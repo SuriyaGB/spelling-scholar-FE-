@@ -59,9 +59,9 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
 
   // Pastel rotation matched to wireframe (using semantic chip tokens for theme safety)
   const pastelClasses = [
-    { bg: "bg-chip", icon: "text-chip-foreground" },
-    { bg: "bg-chip-accent", icon: "text-chip-accent-foreground" },
-    { bg: "bg-chip-warm", icon: "text-chip-warm-foreground" },
+    { bg: "bg-[hsl(var(--channel-green))]", icon: "text-chip-foreground" },
+    { bg: "bg-[hsl(var(--channel-warm))]", icon: "text-chip-warm-foreground" },
+    { bg: "bg-[hsl(var(--channel-purple))]", icon: "text-chip-accent-foreground" },
   ];
 
   const cards: CardConfig[] = [];

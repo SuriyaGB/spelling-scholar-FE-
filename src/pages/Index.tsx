@@ -9,8 +9,18 @@ import { DebugPanel } from "@/components/DebugPanel";
 import { ThemePicker, type ThemeKey } from "@/components/ThemePicker";
 import { PracticeModeSwitch, type PracticeMode } from "@/components/PracticeModeSwitch";
 import { CustomListPanel } from "@/components/CustomListPanel";
+import { ForeignOriginPanel } from "@/components/ForeignOriginPanel";
 import { fetchNextWord, submitSpellingAttempt, fetchPronunciationAudio } from "@/lib/api";
-import type { WordData, CoachingResponse, SupportsUsed, SessionContext, CustomListSummary } from "@/lib/api";
+import type {
+  WordData,
+  CoachingResponse,
+  SupportsUsed,
+  SessionContext,
+  CustomListSummary,
+  ForeignOriginSummary,
+  ForeignOriginDetail,
+  NextWordParams,
+} from "@/lib/api";
 import { cn } from "@/lib/utils";
 import beePng from "@/assets/bee.png";
 
@@ -53,6 +63,11 @@ export default function Index() {
   const [selectedCustomList, setSelectedCustomList] = useState<CustomListSummary | null>(null);
   const [customPracticeActive, setCustomPracticeActive] = useState(false);
 
+  // Foreign origin state
+  const [selectedForeignOrigin, setSelectedForeignOrigin] = useState<ForeignOriginSummary | null>(null);
+  const [selectedForeignOriginDetails, setSelectedForeignOriginDetails] = useState<ForeignOriginDetail | null>(null);
+  const [foreignPracticeActive, setForeignPracticeActive] = useState(false);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme === "default" ? "" : theme);
   }, [theme]);
@@ -76,7 +91,7 @@ export default function Index() {
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
   };
 
-  const loadWord = useCallback(async (lvl: number, customListId?: string) => {
+  const loadWord = useCallback(async (params: NextWordParams) => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -92,7 +107,7 @@ export default function Index() {
     supportsViewed.current = { definitionViewed: false, exampleViewed: false, originViewed: false };
     setSession((s) => ({ ...s, previousAttemptsOnThisWord: 0 }));
     try {
-      const w = await fetchNextWord(lvl, customListId);
+      const w = await fetchNextWord(params);
       setWord(w);
     } catch {
       setError("Could not load word. Check your connection.");
@@ -104,19 +119,33 @@ export default function Index() {
 
   const handleLevelChange = (lvl: number) => {
     setLevel(lvl);
-    loadWord(lvl);
+    loadWord({ level: lvl });
   };
 
   const handleModeChange = (mode: PracticeMode) => {
     setPracticeMode(mode);
     resetWordState();
     setCustomPracticeActive(false);
+    setForeignPracticeActive(false);
   };
 
   const handleStartCustomPractice = () => {
     if (!selectedCustomList) return;
     setCustomPracticeActive(true);
-    loadWord(undefined, selectedCustomList.id);
+    loadWord({ customListId: selectedCustomList.id });
+  };
+
+  const handleStartForeignPractice = () => {
+    if (!selectedForeignOrigin) {
+      setError("Please select an origin first.");
+      return;
+    }
+    if (selectedForeignOrigin.wordCount === 0) {
+      setError("This origin has no words available.");
+      return;
+    }
+    setForeignPracticeActive(true);
+    loadWord({ foreignOrigin: selectedForeignOrigin.origin });
   };
 
   const handleSubmit = async () => {
@@ -147,9 +176,11 @@ export default function Index() {
 
   const handleNextWord = () => {
     if (practiceMode === "custom" && customPracticeActive && selectedCustomList) {
-      loadWord(undefined, selectedCustomList.id);
+      loadWord({ customListId: selectedCustomList.id });
+    } else if (practiceMode === "foreignOrigin" && foreignPracticeActive && selectedForeignOrigin) {
+      loadWord({ foreignOrigin: selectedForeignOrigin.origin });
     } else {
-      loadWord(level);
+      loadWord({ level });
     }
   };
 
@@ -188,7 +219,11 @@ export default function Index() {
 
   const showStandardFlow = practiceMode === "standard";
   const showCustomSetup = practiceMode === "custom" && !customPracticeActive;
-  const showPractice = showStandardFlow || (practiceMode === "custom" && customPracticeActive);
+  const showForeignSetup = practiceMode === "foreignOrigin" && !foreignPracticeActive;
+  const showPractice =
+    showStandardFlow ||
+    (practiceMode === "custom" && customPracticeActive) ||
+    (practiceMode === "foreignOrigin" && foreignPracticeActive);
 
   return (
     <div className="min-h-screen">
@@ -231,6 +266,21 @@ export default function Index() {
           </motion.div>
         )}
 
+        {/* Foreign Origin Setup */}
+        {showForeignSetup && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+            <ForeignOriginPanel
+              selectedOrigin={selectedForeignOrigin}
+              onSelectOrigin={setSelectedForeignOrigin}
+              onDetailsLoaded={setSelectedForeignOriginDetails}
+              onStartPractice={handleStartForeignPractice}
+            />
+            {error && (
+              <p className="mt-3 text-xs text-destructive text-center">{error}</p>
+            )}
+          </motion.div>
+        )}
+
         {/* Active custom list banner */}
         {practiceMode === "custom" && customPracticeActive && selectedCustomList && (
           <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5">
@@ -248,6 +298,29 @@ export default function Index() {
               className="text-xs font-medium text-primary hover:underline"
             >
               Change List
+            </button>
+          </div>
+        )}
+
+        {/* Active foreign origin banner */}
+        {practiceMode === "foreignOrigin" && foreignPracticeActive && selectedForeignOrigin && (
+          <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Practicing {selectedForeignOrigin.origin} origin words
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {selectedForeignOrigin.wordCount} words available
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setForeignPracticeActive(false);
+                resetWordState();
+              }}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Change Origin
             </button>
           </div>
         )}
@@ -418,6 +491,9 @@ export default function Index() {
           practiceMode={practiceMode}
           selectedCustomList={selectedCustomList}
           customPracticeActive={customPracticeActive}
+          selectedForeignOrigin={selectedForeignOrigin}
+          selectedForeignOriginDetails={selectedForeignOriginDetails}
+          foreignPracticeActive={foreignPracticeActive}
         />
       </div>
     </div>

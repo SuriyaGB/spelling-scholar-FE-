@@ -140,13 +140,68 @@ export interface CustomListDetailResponse {
   };
 }
 
-export async function fetchNextWord(level?: number, customListId?: string): Promise<WordData> {
+export interface ForeignOriginSummary {
+  origin: string;
+  wordCount: number;
+}
+
+export interface ForeignOriginsResponse {
+  origins: ForeignOriginSummary[];
+}
+
+export interface ForeignOriginDetail extends ForeignOriginSummary {
+  words: WordData[];
+}
+
+export interface ForeignOriginDetailResponse {
+  origin: ForeignOriginDetail;
+}
+
+export interface NextWordParams {
+  level?: number;
+  customListId?: string;
+  foreignOrigin?: string;
+  exclude?: string[];
+}
+
+export async function fetchNextWord(
+  paramsOrLevel?: number | NextWordParams,
+  customListId?: string,
+): Promise<WordData> {
+  // Backwards-compatible signature: fetchNextWord(level, customListId)
+  const opts: NextWordParams =
+    typeof paramsOrLevel === "object" && paramsOrLevel !== null
+      ? paramsOrLevel
+      : { level: paramsOrLevel as number | undefined, customListId };
+
   const params = new URLSearchParams();
-  if (level != null && !customListId) params.set("level", String(level));
-  if (customListId) params.set("customListId", customListId);
+  // Mode precedence: foreignOrigin > customListId > level. Never mix.
+  if (opts.foreignOrigin) {
+    params.set("foreignOrigin", opts.foreignOrigin);
+  } else if (opts.customListId) {
+    params.set("customListId", opts.customListId);
+  } else if (opts.level != null) {
+    params.set("level", String(opts.level));
+  }
+  if (opts.exclude && opts.exclude.length > 0) {
+    params.set("exclude", opts.exclude.join(","));
+  }
   const res = await fetch(`${BASE_URL}/api/words/next?${params}`);
   if (!res.ok) throw new Error("Failed to fetch word");
   return res.json();
+}
+
+export async function fetchForeignOrigins(): Promise<ForeignOriginsResponse> {
+  const res = await fetch(`${BASE_URL}/api/foreign-origins`);
+  if (!res.ok) throw new Error("Failed to fetch foreign origins");
+  return res.json();
+}
+
+export async function fetchForeignOriginDetails(origin: string): Promise<ForeignOriginDetail> {
+  const res = await fetch(`${BASE_URL}/api/foreign-origins/${encodeURIComponent(origin)}`);
+  if (!res.ok) throw new Error("Failed to fetch foreign origin details");
+  const data: ForeignOriginDetailResponse = await res.json();
+  return data.origin;
 }
 
 export async function fetchCustomLists(): Promise<CustomListsResponse> {

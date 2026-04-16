@@ -135,10 +135,10 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
         </h2>
       </div>
 
-      {/* Channels panel */}
-      <div className="rounded-3xl border border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6 shadow-sm">
+      {/* Channels panel — borderless, just a soft section */}
+      <div className="px-1 sm:px-2">
         <div className="text-center mb-5">
-          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
+          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground/80">
             <Sparkles className="h-3.5 w-3.5" />
             Practice Channels
           </div>
@@ -154,7 +154,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5 auto-rows-fr">
             {cards.map((card, idx) => {
               const Icon = card.Icon;
               return (
@@ -168,23 +168,23 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
                   onClick={card.onClick}
                   className={cn(
                     "group relative flex flex-col items-center justify-center text-center",
-                    "rounded-2xl p-4 aspect-[4/3] transition-all",
+                    "rounded-2xl p-5 aspect-square transition-all",
                     "shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     card.bgClass
                   )}
                 >
                   <div
                     className={cn(
-                      "rounded-xl bg-background/60 p-2.5 mb-2 transition-transform group-hover:scale-110",
+                      "rounded-xl bg-background/60 p-3 mb-3 transition-transform group-hover:scale-110",
                       card.iconColorClass
                     )}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">
+                  <h3 className="text-sm font-semibold text-foreground/70 leading-tight line-clamp-2">
                     {card.title}
                   </h3>
-                  <p className="text-[11px] text-muted-foreground mt-1">{card.subtitle}</p>
+                  <p className="text-[11px] text-muted-foreground/80 mt-1">{card.subtitle}</p>
                 </motion.button>
               );
             })}

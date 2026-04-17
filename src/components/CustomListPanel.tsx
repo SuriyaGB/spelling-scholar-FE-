@@ -96,12 +96,37 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
       setListName("");
       setWordsText("");
       loadLists();
-    } catch {
-      setImportError("Import failed. Please try again.");
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        setImportError("Your session expired. Please sign in again.");
+      } else {
+        setImportError("Import failed. Please try again.");
+      }
     } finally {
       setImporting(false);
     }
   };
+
+  // Logged-out gate
+  if (configured && !authLoading && !user) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-xl border border-border bg-card p-6 text-center space-y-3">
+          <List className="h-6 w-6 mx-auto text-muted-foreground" />
+          <p className="text-sm text-foreground font-medium">
+            Sign in to view and practice your custom lists.
+          </p>
+          <button
+            onClick={() => setAuthOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            <LogIn className="h-4 w-4" /> Sign in
+          </button>
+        </div>
+        <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

@@ -148,7 +148,24 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
           <Loader2 className="h-4 w-4 animate-spin text-primary" />
         </div>
       )}
-      {listsError && <p className="text-xs text-destructive">{listsError}</p>}
+      {listsError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-center space-y-2">
+          <p className="text-xs text-destructive">{listsError}</p>
+          {listsError.toLowerCase().includes("session") ? (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              <LogIn className="h-3 w-3" /> Sign in again
+            </button>
+          ) : (
+            <button onClick={loadLists} className="text-xs text-primary hover:underline">
+              Retry
+            </button>
+          )}
+        </div>
+      )}
+      <AuthDialog open={authOpen} onOpenChange={(o) => { setAuthOpen(o); if (!o) loadLists(); }} />
 
       {!listsLoading && lists.length === 0 && !listsError && (
         <p className="text-xs text-muted-foreground text-center py-4">No custom lists yet. Import one to get started.</p>

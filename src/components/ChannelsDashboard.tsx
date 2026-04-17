@@ -127,7 +127,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5 auto-rows-fr">
+          <div className="mx-auto grid grid-cols-3 gap-4 sm:gap-5 auto-rows-fr max-w-[640px] [grid-template-columns:repeat(3,minmax(0,180px))] justify-center">
             {cards.map((card, idx) => {
               const Icon = card.Icon;
               return (

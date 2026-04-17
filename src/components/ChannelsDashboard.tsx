@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { GraduationCap, BookOpen, Globe, Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 import {
   fetchCustomLists,
   fetchForeignOrigins,
@@ -32,6 +33,7 @@ interface CardConfig {
 }
 
 export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
+  const { user } = useAuth();
   const [customLists, setCustomLists] = useState<CustomListSummary[]>([]);
   const [origins, setOrigins] = useState<ForeignOriginSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,12 +42,14 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     let cancelled = false;
     async function load() {
       try {
+        // Only fetch custom lists when authenticated to avoid 401 noise.
         const [listsRes, originsRes] = await Promise.allSettled([
-          fetchCustomLists(),
+          user ? fetchCustomLists() : Promise.resolve({ lists: [] as CustomListSummary[] }),
           fetchForeignOrigins(),
         ]);
         if (cancelled) return;
         if (listsRes.status === "fulfilled") setCustomLists(listsRes.value.lists || []);
+        else setCustomLists([]);
         if (originsRes.status === "fulfilled") setOrigins(originsRes.value.origins || []);
       } finally {
         if (!cancelled) setLoading(false);
@@ -55,7 +59,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   // Pastel rotation matched to wireframe (using semantic chip tokens for theme safety)
   const pastelClasses = [
@@ -81,7 +85,11 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
   cards.push({
     key: "custom-manage",
     title: "My Lists",
-    subtitle: customLists.length > 0 ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}` : "Import a new list",
+    subtitle: !user
+      ? "Sign in required"
+      : customLists.length > 0
+        ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}`
+        : "Import a new list",
     Icon: BookOpen,
     bgClass: "bg-[hsl(var(--channel-warm))]",
     iconColorClass: "text-secondary",

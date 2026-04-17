@@ -1,4 +1,18 @@
+import { getAccessToken } from "@/lib/supabase";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+export class UnauthorizedError extends Error {
+  constructor(message = "Unauthorized") {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}
+
+async function authHeaders(): Promise<Record<string, string>> {
+  const token = await getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 export interface WordData {
   word: string;
@@ -186,7 +200,10 @@ export async function fetchNextWord(
   if (opts.exclude && opts.exclude.length > 0) {
     params.set("exclude", opts.exclude.join(","));
   }
-  const res = await fetch(`${BASE_URL}/api/words/next?${params}`);
+  // Custom list practice requires auth; level/foreignOrigin are public.
+  const headers = opts.customListId ? await authHeaders() : {};
+  const res = await fetch(`${BASE_URL}/api/words/next?${params}`, { headers });
+  if (res.status === 401) throw new UnauthorizedError();
   if (!res.ok) throw new Error("Failed to fetch word");
   return res.json();
 }
@@ -205,13 +222,17 @@ export async function fetchForeignOriginDetails(origin: string): Promise<Foreign
 }
 
 export async function fetchCustomLists(): Promise<CustomListsResponse> {
-  const res = await fetch(`${BASE_URL}/api/custom-lists`);
+  const res = await fetch(`${BASE_URL}/api/custom-lists`, { headers: await authHeaders() });
+  if (res.status === 401) throw new UnauthorizedError();
   if (!res.ok) throw new Error("Failed to fetch custom lists");
   return res.json();
 }
 
 export async function fetchCustomListWords(listId: string): Promise<WordData[]> {
-  const res = await fetch(`${BASE_URL}/api/custom-lists/${encodeURIComponent(listId)}`);
+  const res = await fetch(`${BASE_URL}/api/custom-lists/${encodeURIComponent(listId)}`, {
+    headers: await authHeaders(),
+  });
+  if (res.status === 401) throw new UnauthorizedError();
   if (!res.ok) throw new Error("Failed to fetch custom list words");
   const data = await res.json();
 
@@ -225,9 +246,10 @@ export async function fetchCustomListWords(listId: string): Promise<WordData[]> 
 export async function importCustomWordList(payload: ImportCustomListRequest): Promise<ImportCustomListResponse> {
   const res = await fetch(`${BASE_URL}/api/words/import-custom`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(payload),
   });
+  if (res.status === 401) throw new UnauthorizedError();
   if (!res.ok) throw new Error("Failed to import custom list");
   return res.json();
 }

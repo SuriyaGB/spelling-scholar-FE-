@@ -24,6 +24,7 @@ import type {
   NextWordParams,
 } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { AuthMenu } from "@/components/AuthMenu";
 import beePng from "@/assets/bee.png";
 
 const DEFAULT_PROFILE = {
@@ -284,6 +285,7 @@ export default function Index() {
             </div>
           </div>
           <div className="flex-1 flex items-center justify-end gap-1">
+            <AuthMenu />
             <button
               onClick={toggleSound}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

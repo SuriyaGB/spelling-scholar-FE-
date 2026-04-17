@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, Upload, List, Check, BookOpen, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, Upload, List, Check, ChevronDown, ChevronRight, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fetchCustomLists, importCustomWordList, fetchCustomListWords } from "@/lib/api";
+import { fetchCustomLists, importCustomWordList, fetchCustomListWords, UnauthorizedError } from "@/lib/api";
 import type { CustomListSummary, ImportCustomListResponse, WordData } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { AuthDialog } from "@/components/AuthDialog";
 
 interface CustomListPanelProps {
   selectedList: CustomListSummary | null;
@@ -11,6 +13,9 @@ interface CustomListPanelProps {
 }
 
 export function CustomListPanel({ selectedList, onSelectList, onStartPractice }: CustomListPanelProps) {
+  const { user, loading: authLoading, configured } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
   const [lists, setLists] = useState<CustomListSummary[]>([]);
   const [listsLoading, setListsLoading] = useState(false);
   const [listsError, setListsError] = useState<string | null>(null);
@@ -28,17 +33,22 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
   const [wordsLoadingId, setWordsLoadingId] = useState<string | null>(null);
 
   const loadLists = useCallback(async () => {
+    if (!user) return;
     setListsLoading(true);
     setListsError(null);
     try {
       const data = await fetchCustomLists();
       setLists(data.lists || []);
-    } catch {
-      setListsError("Could not load custom lists.");
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        setListsError("Your session expired. Please sign in again.");
+      } else {
+        setListsError("Could not load custom lists.");
+      }
     } finally {
       setListsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => { loadLists(); }, [loadLists]);
 
@@ -86,12 +96,37 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
       setListName("");
       setWordsText("");
       loadLists();
-    } catch {
-      setImportError("Import failed. Please try again.");
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        setImportError("Your session expired. Please sign in again.");
+      } else {
+        setImportError("Import failed. Please try again.");
+      }
     } finally {
       setImporting(false);
     }
   };
+
+  // Logged-out gate
+  if (configured && !authLoading && !user) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-xl border border-border bg-card p-6 text-center space-y-3">
+          <List className="h-6 w-6 mx-auto text-muted-foreground" />
+          <p className="text-sm text-foreground font-medium">
+            Sign in to view and practice your custom lists.
+          </p>
+          <button
+            onClick={() => setAuthOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            <LogIn className="h-4 w-4" /> Sign in
+          </button>
+        </div>
+        <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -113,7 +148,24 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
           <Loader2 className="h-4 w-4 animate-spin text-primary" />
         </div>
       )}
-      {listsError && <p className="text-xs text-destructive">{listsError}</p>}
+      {listsError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-center space-y-2">
+          <p className="text-xs text-destructive">{listsError}</p>
+          {listsError.toLowerCase().includes("session") ? (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              <LogIn className="h-3 w-3" /> Sign in again
+            </button>
+          ) : (
+            <button onClick={loadLists} className="text-xs text-primary hover:underline">
+              Retry
+            </button>
+          )}
+        </div>
+      )}
+      <AuthDialog open={authOpen} onOpenChange={(o) => { setAuthOpen(o); if (!o) loadLists(); }} />
 
       {!listsLoading && lists.length === 0 && !listsError && (
         <p className="text-xs text-muted-foreground text-center py-4">No custom lists yet. Import one to get started.</p>

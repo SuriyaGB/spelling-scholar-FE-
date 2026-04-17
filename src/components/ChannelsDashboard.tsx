@@ -85,7 +85,11 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
   cards.push({
     key: "custom-manage",
     title: "My Lists",
-    subtitle: customLists.length > 0 ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}` : "Import a new list",
+    subtitle: !user
+      ? "Sign in required"
+      : customLists.length > 0
+        ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}`
+        : "Import a new list",
     Icon: BookOpen,
     bgClass: "bg-[hsl(var(--channel-warm))]",
     iconColorClass: "text-secondary",

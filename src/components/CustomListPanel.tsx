@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, Upload, List, Check, BookOpen, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, Upload, List, Check, ChevronDown, ChevronRight, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { fetchCustomLists, importCustomWordList, fetchCustomListWords } from "@/lib/api";
+import { fetchCustomLists, importCustomWordList, fetchCustomListWords, UnauthorizedError } from "@/lib/api";
 import type { CustomListSummary, ImportCustomListResponse, WordData } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { AuthDialog } from "@/components/AuthDialog";
 
 interface CustomListPanelProps {
   selectedList: CustomListSummary | null;
@@ -11,6 +13,9 @@ interface CustomListPanelProps {
 }
 
 export function CustomListPanel({ selectedList, onSelectList, onStartPractice }: CustomListPanelProps) {
+  const { user, loading: authLoading, configured } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
   const [lists, setLists] = useState<CustomListSummary[]>([]);
   const [listsLoading, setListsLoading] = useState(false);
   const [listsError, setListsError] = useState<string | null>(null);
@@ -28,17 +33,22 @@ export function CustomListPanel({ selectedList, onSelectList, onStartPractice }:
   const [wordsLoadingId, setWordsLoadingId] = useState<string | null>(null);
 
   const loadLists = useCallback(async () => {
+    if (!user) return;
     setListsLoading(true);
     setListsError(null);
     try {
       const data = await fetchCustomLists();
       setLists(data.lists || []);
-    } catch {
-      setListsError("Could not load custom lists.");
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        setListsError("Your session expired. Please sign in again.");
+      } else {
+        setListsError("Could not load custom lists.");
+      }
     } finally {
       setListsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => { loadLists(); }, [loadLists]);
 

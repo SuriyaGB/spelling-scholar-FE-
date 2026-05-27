@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "@/lib/supabase";
+import { invalidateCustomListsCache } from "@/lib/api";
 
 interface AuthContextValue {
   user: User | null;
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     // 1. Set up listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      invalidateCustomListsCache();
       setSession(newSession);
       setUser(newSession?.user ?? null);
     });

@@ -278,6 +278,7 @@ export async function importCustomWordList(payload: ImportCustomListRequest): Pr
   });
   if (res.status === 401) throw new UnauthorizedError();
   if (!res.ok) throw new Error("Failed to import custom list");
+  invalidateCustomListsCache();
   return res.json();
 }
 

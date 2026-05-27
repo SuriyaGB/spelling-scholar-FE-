@@ -208,10 +208,30 @@ export async function fetchNextWord(
   return res.json();
 }
 
+// Module-level promise caches. These endpoints return data that rarely changes
+// during a session, so we dedupe + cache across all components/mounts.
+// Invalidate explicitly after mutations (import list) or auth changes.
+let foreignOriginsCache: Promise<ForeignOriginsResponse> | null = null;
+let customListsCache: Promise<CustomListsResponse> | null = null;
+
+export function invalidateForeignOriginsCache() {
+  foreignOriginsCache = null;
+}
+export function invalidateCustomListsCache() {
+  customListsCache = null;
+}
+
 export async function fetchForeignOrigins(): Promise<ForeignOriginsResponse> {
-  const res = await fetch(`${BASE_URL}/api/foreign-origins`);
-  if (!res.ok) throw new Error("Failed to fetch foreign origins");
-  return res.json();
+  if (foreignOriginsCache) return foreignOriginsCache;
+  foreignOriginsCache = (async () => {
+    const res = await fetch(`${BASE_URL}/api/foreign-origins`);
+    if (!res.ok) throw new Error("Failed to fetch foreign origins");
+    return res.json();
+  })().catch((err) => {
+    foreignOriginsCache = null;
+    throw err;
+  });
+  return foreignOriginsCache;
 }
 
 export async function fetchForeignOriginDetails(origin: string): Promise<ForeignOriginDetail> {
@@ -222,10 +242,17 @@ export async function fetchForeignOriginDetails(origin: string): Promise<Foreign
 }
 
 export async function fetchCustomLists(): Promise<CustomListsResponse> {
-  const res = await fetch(`${BASE_URL}/api/custom-lists`, { headers: await authHeaders() });
-  if (res.status === 401) throw new UnauthorizedError();
-  if (!res.ok) throw new Error("Failed to fetch custom lists");
-  return res.json();
+  if (customListsCache) return customListsCache;
+  customListsCache = (async () => {
+    const res = await fetch(`${BASE_URL}/api/custom-lists`, { headers: await authHeaders() });
+    if (res.status === 401) throw new UnauthorizedError();
+    if (!res.ok) throw new Error("Failed to fetch custom lists");
+    return res.json();
+  })().catch((err) => {
+    customListsCache = null;
+    throw err;
+  });
+  return customListsCache;
 }
 
 export async function fetchCustomListWords(listId: string): Promise<WordData[]> {

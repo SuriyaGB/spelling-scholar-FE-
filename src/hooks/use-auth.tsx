@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     // 1. Set up listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      invalidateCustomListsCache();
       setSession(newSession);
       setUser(newSession?.user ?? null);
     });

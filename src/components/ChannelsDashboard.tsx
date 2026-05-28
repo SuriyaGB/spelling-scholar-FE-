@@ -99,14 +99,14 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
   ];
 
   return (
-    <div className="space-y-10 sm:space-y-14">
+    <div className="space-y-10 sm:space-y-14 text-4xl font-semibold">
       {/* Hero */}
       <div className="text-center max-w-3xl mx-auto pt-4 sm:pt-8 space-y-4">
         <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 rounded-full px-3 py-1">
           <Sparkles className="h-3.5 w-3.5" />
           Spelling Coach
         </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold tracking-tight text-foreground leading-[1.05]">
+        <h1 className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-foreground leading-[1.05] lg:text-4xl">
           Master every word, <span className="text-primary">one at a time.</span>
         </h1>
         <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">

@@ -268,7 +268,7 @@ export default function Index() {
   const channelLabels: Record<PracticeMode, { label: string; Icon: typeof GraduationCap }> = {
     standard: { label: "Standard Practice", Icon: GraduationCap },
     custom: { label: "Custom Lists", Icon: ListIcon },
-    foreignOrigin: { label: "Foreign Origin", Icon: Globe },
+    foreignOrigin: { label: "Language Origin", Icon: Globe },
   };
 
   return (

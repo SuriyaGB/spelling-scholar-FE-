@@ -69,7 +69,7 @@ export function ForeignOriginPanel({
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-          <Globe className="h-4 w-4" /> Words by Foreign Origin
+          <Globe className="h-4 w-4" /> Words by Language Origin
         </h3>
       </div>
 

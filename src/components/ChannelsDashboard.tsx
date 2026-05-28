@@ -86,7 +86,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     },
     {
       key: "foreign-manage",
-      title: "Foreign Origins",
+      title: "Language Origins",
       subtitle:
         origins.length > 0
           ? `Explore ${origins.length} language${origins.length === 1 ? "" : "s"} of origin and master tricky loanwords.`

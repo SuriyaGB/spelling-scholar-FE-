@@ -58,7 +58,7 @@ export function DebugPanel({
           )}
           {selectedForeignOrigin && (
             <div>
-              <strong>Foreign Origin:</strong> {selectedForeignOrigin.origin} ({selectedForeignOrigin.wordCount} words)
+              <strong>Language Origin:</strong> {selectedForeignOrigin.origin} ({selectedForeignOrigin.wordCount} words)
               <br /><strong>Foreign Practice Active:</strong> {String(!!foreignPracticeActive)}
               {selectedForeignOriginDetails && (
                 <>

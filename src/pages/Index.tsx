@@ -25,6 +25,7 @@ import type {
 } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { AuthMenu } from "@/components/AuthMenu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import beePng from "@/assets/bee.png";
 
 const DEFAULT_PROFILE = {
@@ -288,13 +289,18 @@ export default function Index() {
           </button>
           <div className="flex items-center gap-1">
             <AuthMenu />
-            <button
-              onClick={toggleSound}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              title="Sound"
-            >
-              {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleSound}
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                  aria-label="Sound"
+                >
+                  {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Sound</TooltipContent>
+            </Tooltip>
             <ThemePicker current={theme} onChange={setTheme} />
           </div>
         </div>

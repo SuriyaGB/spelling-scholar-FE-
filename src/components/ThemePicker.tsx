@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type ThemeKey = "default" | "warm" | "bright" | "nature" | "space" | "candy" | "bee";
 
@@ -83,13 +84,18 @@ export function ThemePicker({ current, onChange }: ThemePickerProps) {
 
   return (
     <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
-        title="Theme"
-      >
-        <Palette className="h-4 w-4 text-muted-foreground" />
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
+            aria-label="Theme"
+          >
+            <Palette className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Theme</TooltipContent>
+      </Tooltip>
 
       {open && (
         <div className="absolute right-0 top-full mt-2 z-50 w-64 rounded-xl border border-border bg-popover p-2 shadow-lg animate-pop-in">

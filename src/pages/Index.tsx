@@ -291,7 +291,7 @@ export default function Index() {
             <button
               onClick={toggleSound}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              title={soundEnabled ? "Mute cheer sound" : "Unmute cheer sound"}
+              title="Sound"
             >
               {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </button>

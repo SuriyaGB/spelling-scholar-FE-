@@ -61,81 +61,72 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     };
   }, [user]);
 
-  // Pastel rotation matched to wireframe (using semantic chip tokens for theme safety)
-  const pastelClasses = [
-    { bg: "bg-[hsl(var(--channel-green))]", icon: "text-chip-foreground" },
-    { bg: "bg-[hsl(var(--channel-warm))]", icon: "text-chip-warm-foreground" },
-    { bg: "bg-[hsl(var(--channel-purple))]", icon: "text-chip-accent-foreground" },
+  const cards: CardConfig[] = [
+    {
+      key: "standard",
+      title: "Standard Practice",
+      subtitle: "Curated words organized by level. Pick a grade band and start drilling.",
+      Icon: GraduationCap,
+      bgClass: "bg-[hsl(var(--channel-green))]",
+      iconColorClass: "text-primary",
+      onClick: () => onSelectChannel({ kind: "standard" }),
+    },
+    {
+      key: "custom-manage",
+      title: "My Lists",
+      subtitle: !user
+        ? "Sign in to import your own word lists from a CSV or text file."
+        : customLists.length > 0
+          ? `${customLists.length} saved list${customLists.length === 1 ? "" : "s"}. Practice or import more.`
+          : "Import a new list from a CSV or text file to practice your own words.",
+      Icon: BookOpen,
+      bgClass: "bg-[hsl(var(--channel-warm))]",
+      iconColorClass: "text-secondary",
+      onClick: () => onSelectChannel({ kind: "customManage" }),
+    },
+    {
+      key: "foreign-manage",
+      title: "Foreign Origins",
+      subtitle:
+        origins.length > 0
+          ? `Explore ${origins.length} language${origins.length === 1 ? "" : "s"} of origin and master tricky loanwords.`
+          : "Explore words grouped by their language of origin.",
+      Icon: Globe,
+      bgClass: "bg-[hsl(var(--channel-purple))]",
+      iconColorClass: "text-accent",
+      onClick: () => onSelectChannel({ kind: "foreignManage" }),
+    },
   ];
 
-  const cards: CardConfig[] = [];
-
-  // Standard Practice — always first, always primary tone
-  cards.push({
-    key: "standard",
-    title: "Standard Practice",
-    subtitle: "Words by level",
-    Icon: GraduationCap,
-    bgClass: "bg-[hsl(var(--channel-green))]",
-    iconColorClass: "text-primary",
-    onClick: () => onSelectChannel({ kind: "standard" }),
-  });
-
-  // "My Lists" entry — opens the list management/selection screen
-  cards.push({
-    key: "custom-manage",
-    title: "My Lists",
-    subtitle: !user
-      ? "Sign in required"
-      : customLists.length > 0
-        ? `${customLists.length} list${customLists.length === 1 ? "" : "s"}`
-        : "Import a new list",
-    Icon: BookOpen,
-    bgClass: "bg-[hsl(var(--channel-warm))]",
-    iconColorClass: "text-secondary",
-    onClick: () => onSelectChannel({ kind: "customManage" }),
-  });
-
-  // "Foreign Origins" entry — opens the origin browse screen
-  cards.push({
-    key: "foreign-manage",
-    title: "Foreign Origins",
-    subtitle: origins.length > 0 ? `${origins.length} language${origins.length === 1 ? "" : "s"}` : "Explore by language",
-    Icon: Globe,
-    bgClass: "bg-[hsl(var(--channel-purple))]",
-    iconColorClass: "text-accent",
-    onClick: () => onSelectChannel({ kind: "foreignManage" }),
-  });
-
   return (
-    <div className="space-y-6">
-      {/* Welcome heading */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl sm:text-3xl font-display text-foreground tracking-tight">
-          What will you practice today?
-        </h2>
+    <div className="space-y-10 sm:space-y-14">
+      {/* Hero */}
+      <div className="text-center max-w-3xl mx-auto pt-4 sm:pt-8 space-y-4">
+        <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 rounded-full px-3 py-1">
+          <Sparkles className="h-3.5 w-3.5" />
+          Spelling Coach
+        </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold tracking-tight text-foreground leading-[1.05]">
+          Master every word, <span className="text-primary">one at a time.</span>
+        </h1>
+        <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+          Practice spelling with audio pronunciation, smart hints, and personalized coaching. Choose a channel below to begin.
+        </p>
       </div>
 
-      {/* Channels panel — borderless, just a soft section */}
-      <div className="px-1 sm:px-2">
-        <div className="text-center mb-5">
-          <div className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground/80">
-            <Sparkles className="h-3.5 w-3.5" />
-            Practice Channels
-          </div>
-          <div className="flex justify-center gap-1 mt-2" aria-hidden>
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50" />
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
-          </div>
+      {/* Channel cards — webapp grid */}
+      <div>
+        <div className="flex items-baseline justify-between mb-5 px-1">
+          <h2 className="text-lg sm:text-xl font-display font-semibold text-foreground">Practice channels</h2>
+          <span className="text-xs text-muted-foreground">{cards.length} ways to practice</span>
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-12">
+          <div className="flex justify-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="mx-auto grid grid-cols-3 gap-4 sm:gap-5 auto-rows-fr max-w-[640px] [grid-template-columns:repeat(3,minmax(0,180px))] justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {cards.map((card, idx) => {
               const Icon = card.Icon;
               return (
@@ -143,29 +134,31 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
                   key={card.key}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(idx * 0.04, 0.4) }}
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.97 }}
+                  transition={{ delay: Math.min(idx * 0.05, 0.4) }}
+                  whileHover={{ y: -2 }}
                   onClick={card.onClick}
                   className={cn(
-                    "group relative flex flex-col items-center justify-center text-center",
-                    "rounded-2xl p-5 aspect-square transition-all",
-                    "shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    card.bgClass
+                    "group relative flex flex-col items-start text-left",
+                    "rounded-2xl p-6 min-h-[180px] bg-card border border-border/60",
+                    "transition-all shadow-sm hover:shadow-lg hover:border-primary/40",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   )}
                 >
                   <div
                     className={cn(
-                      "rounded-xl bg-background/60 p-3 mb-3 transition-transform group-hover:scale-110",
+                      "rounded-xl p-2.5 mb-4 transition-transform group-hover:scale-110",
+                      card.bgClass,
                       card.iconColorClass
                     )}
                   >
-                    <Icon className="h-6 w-6" />
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="text-sm font-semibold text-foreground/70 leading-tight line-clamp-2">
+                  <h3 className="text-lg font-display font-semibold text-foreground leading-tight">
                     {card.title}
                   </h3>
-                  <p className="text-[11px] text-muted-foreground/80 mt-1">{card.subtitle}</p>
+                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+                    {card.subtitle}
+                  </p>
                 </motion.button>
               );
             })}

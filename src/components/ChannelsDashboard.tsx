@@ -139,15 +139,15 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
                   onClick={card.onClick}
                   className={cn(
                     "group relative flex flex-col items-start text-left",
-                    "rounded-2xl p-6 min-h-[180px] bg-card border border-border/60",
-                    "transition-all shadow-sm hover:shadow-lg hover:border-primary/40",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    "rounded-2xl p-6 min-h-[180px] border border-border/40",
+                    "transition-all shadow-sm hover:shadow-lg hover:-translate-y-0.5",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    card.bgClass
                   )}
                 >
                   <div
                     className={cn(
-                      "rounded-xl p-2.5 mb-4 transition-transform group-hover:scale-110",
-                      card.bgClass,
+                      "rounded-xl bg-background/70 p-2.5 mb-4 transition-transform group-hover:scale-110",
                       card.iconColorClass
                     )}
                   >

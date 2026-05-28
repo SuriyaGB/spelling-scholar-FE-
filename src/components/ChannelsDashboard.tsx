@@ -110,7 +110,8 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
           Master every word, <span className="text-primary">one at a time.</span>
         </h1>
         <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-          Practice spelling with audio, smart hints, and personalized{"\n"}AI-powered coaching. Choose a practice mode below to begin.
+          Practice spelling with audio, smart hints, and personalized<br />
+          AI-powered coaching. Choose a practice mode below to begin.
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display&family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display&family=Nunito:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -179,7 +179,7 @@
     --channel-purple: 220 55% 84%;
 
     --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Baloo 2', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
 
   /* ── Nature / Adventure ── */
@@ -237,7 +237,7 @@
     --channel-purple: 195 45% 82%;
 
     --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Baloo 2', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
 
   /* ── Space / Cosmic ── */
@@ -295,7 +295,7 @@
     --channel-purple: 270 35% 26%;
 
     --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Baloo 2', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
 
   /* ── Candy / Pastel ── */
@@ -353,7 +353,7 @@
     --channel-purple: 260 40% 85%;
 
     --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Baloo 2', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
 
   /* ── Bee / Honeycomb ── */
@@ -411,7 +411,7 @@
     --channel-purple: 30 50% 80%;
 
     --font-display: 'Fredoka', sans-serif;
-    --font-body: 'Baloo 2', sans-serif;
+    --font-body: 'Nunito', sans-serif;
   }
 }
 

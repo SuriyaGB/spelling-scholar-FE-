@@ -65,7 +65,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     {
       key: "standard",
       title: "Standard Practice",
-      subtitle: "Curated words organized by level. Pick a grade band and start drilling.",
+      subtitle: "Curated words organized by level. Pick a grade level and start drilling.",
       Icon: GraduationCap,
       bgClass: "bg-[hsl(var(--channel-green))]",
       iconColorClass: "text-primary",

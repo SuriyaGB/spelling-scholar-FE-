@@ -307,7 +307,7 @@ export default function Index() {
       </header>
 
       <div className={cn(
-        "mx-auto px-4 sm:px-8 py-8 sm:py-12",
+        "mx-auto px-4 sm:px-8 py-6 sm:py-10",
         showDashboard ? "max-w-6xl" : "max-w-2xl"
       )}>
         {/* Dashboard or active channel header */}

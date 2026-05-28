@@ -86,7 +86,7 @@ export function ThemePicker({ current, onChange }: ThemePickerProps) {
       <button
         onClick={() => setOpen((v) => !v)}
         className="p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
-        title="Change theme"
+        title="Theme"
       >
         <Palette className="h-4 w-4 text-muted-foreground" />
       </button>

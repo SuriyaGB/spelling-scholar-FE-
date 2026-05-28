@@ -20,9 +20,14 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./spelling-scholar-fe
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          path: spelling-scholar-fe
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest

@@ -10,7 +10,7 @@ interface PracticeModeSwitchProps {
 const LABELS: Record<PracticeMode, string> = {
   standard: "Standard",
   custom: "Custom Lists",
-  foreignOrigin: "Foreign Origin",
+  foreignOrigin: "Language Origin",
 };
 
 export function PracticeModeSwitch({ mode, onChange }: PracticeModeSwitchProps) {

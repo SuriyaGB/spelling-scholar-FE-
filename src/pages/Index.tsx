@@ -273,22 +273,24 @@ export default function Index() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-lg px-4 py-6 sm:py-10">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1" />
-          <div className="text-center flex items-center justify-center gap-2">
-            <img src={beePng} alt="Spelling bee mascot" className="h-20 w-auto -mr-2" />
-            <div>
-              <h1 className="text-3xl font-display text-foreground tracking-tight">Spelling Coach</h1>
-              <p className="text-sm text-muted-foreground mt-1">Practice one word at a time</p>
-            </div>
-          </div>
-          <div className="flex-1 flex items-center justify-end gap-1">
+      {/* Top app bar — webapp style */}
+      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
+          <button
+            onClick={handleBackToDashboard}
+            className="flex items-center gap-2 rounded-lg px-1.5 py-1 -ml-1.5 hover:bg-accent/30 transition-colors"
+            title="Home"
+          >
+            <img src={beePng} alt="Spelling bee mascot" className="h-9 w-auto" />
+            <span className="text-lg font-display font-semibold tracking-tight text-foreground">
+              Spelling Coach
+            </span>
+          </button>
+          <div className="flex items-center gap-1">
             <AuthMenu />
             <button
               onClick={toggleSound}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               title={soundEnabled ? "Mute cheer sound" : "Unmute cheer sound"}
             >
               {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -296,26 +298,31 @@ export default function Index() {
             <ThemePicker current={theme} onChange={setTheme} />
           </div>
         </div>
+      </header>
 
+      <div className={cn(
+        "mx-auto px-4 sm:px-8 py-8 sm:py-12",
+        showDashboard ? "max-w-6xl" : "max-w-2xl"
+      )}>
         {/* Dashboard or active channel header */}
         {showDashboard ? (
           <ChannelsDashboard onSelectChannel={handleSelectChannel} />
         ) : (
-          <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="mb-6 flex items-center justify-between gap-2">
             <button
               onClick={handleBackToDashboard}
-              className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors rounded-lg px-2 py-1.5 hover:bg-accent/30"
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg px-2 py-1.5 hover:bg-accent/30"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
+              <ArrowLeft className="h-4 w-4" />
               All channels
             </button>
             {activeChannel && (
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+              <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
                 {(() => {
                   const { Icon, label } = channelLabels[activeChannel];
                   return (
                     <>
-                      <Icon className="h-3.5 w-3.5 text-primary" />
+                      <Icon className="h-4 w-4 text-primary" />
                       {label}
                     </>
                   );

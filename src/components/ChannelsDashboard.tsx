@@ -117,7 +117,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
       {/* Channel cards — webapp grid */}
       <div>
         <div className="flex items-baseline justify-between mb-5 px-1">
-          <h2 className="text-lg sm:text-xl font-display font-semibold text-foreground">Practice channels</h2>
+          <h2 className="text-lg sm:text-xl font-display font-semibold text-foreground">Practice Modes</h2>
           <span className="text-xs text-muted-foreground">{cards.length} ways to practice</span>
         </div>
 

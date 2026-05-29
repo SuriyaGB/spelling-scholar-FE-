@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, BookOpen, Globe, Sparkles, Loader2 } from "lucide-react";
+import { GraduationCap, BookOpen, Globe, Sparkles, Loader2, Trophy, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -65,7 +65,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     {
       key: "standard",
       title: "Standard Practice",
-      subtitle: "Curated words organized by level. Pick a level and start practicing.",
+      subtitle: "Curated words organized by level. Pick a level and get started.",
       Icon: GraduationCap,
       bgClass: "bg-[hsl(var(--channel-green))]",
       iconColorClass: "text-primary",
@@ -73,9 +73,9 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
     },
     {
       key: "custom-manage",
-      title: "My Lists",
+      title: "My Word Lists",
       subtitle: !user
-        ? "Sign in to import your own word lists from a CSV or text file."
+        ? "Sign in to bring your own word lists from a CSV or text file or type them in the app."
         : customLists.length > 0
           ? `${customLists.length} saved list${customLists.length === 1 ? "" : "s"}. Practice or import more.`
           : "Import a new list from a CSV or text file to practice your own words.",
@@ -96,6 +96,24 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
       iconColorClass: "text-accent",
       onClick: () => onSelectChannel({ kind: "foreignManage" }),
     },
+    {
+      key: "mock-bee",
+      title: "Mock Bee",
+      subtitle: "Practice in spelling bee-style with timed words and competition words.",
+      Icon: Trophy,
+      bgClass: "bg-[hsl(var(--channel-yellow))]",
+      iconColorClass: "text-warning",
+      onClick: () => {},
+    },
+    {
+      key: "reports",
+      title: "Reports",
+      subtitle: "Track progress, accuracy trends, and words that need more practice.",
+      Icon: BarChart3,
+      bgClass: "bg-[hsl(var(--channel-blue))]",
+      iconColorClass: "text-info",
+      onClick: () => {},
+    },
   ];
 
   return (
@@ -104,10 +122,10 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
       <div className="text-center max-w-3xl mx-auto pt-0 space-y-3">
         <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 rounded-full px-3 py-1">
           <Sparkles className="h-3.5 w-3.5" />
-          Spelling Coach
+          AI Spelling Coach
         </div>
-        <h1 className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-foreground leading-[1.05] lg:text-4xl">
-          Master every word, <span className="text-primary">one at a time.</span>
+        <h1 className="text-4xl sm:text-5xl font-display tracking-tight text-foreground leading-[1.05] lg:text-4xl font-semibold">
+          <span className="text-[#1e3a5f] font-serif">Master every word, </span><span className="text-primary font-serif">one at a time.</span>
         </h1>
         <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
           Practice spelling with audio, smart hints, and personalized<br />
@@ -117,11 +135,6 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
 
       {/* Channel cards — webapp grid */}
       <div>
-        <div className="flex items-baseline justify-between mb-5 px-1">
-          <h2 className="text-lg sm:text-xl font-display font-semibold text-foreground">Practice Modes</h2>
-          <span className="text-xs text-muted-foreground">{cards.length} ways to practice</span>
-        </div>
-
         {loading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -154,7 +167,7 @@ export function ChannelsDashboard({ onSelectChannel }: ChannelsDashboardProps) {
                   >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="text-lg font-display font-semibold text-foreground leading-tight">
+                  <h3 className="font-display tracking-tight text-[#1e3a5f] text-lg font-serif font-semibold">
                     {card.title}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">

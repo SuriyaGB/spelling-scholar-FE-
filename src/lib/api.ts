@@ -1,6 +1,11 @@
 import { getAccessToken } from "@/lib/supabase";
+import { mockNextWord, mockCoaching, mockPronunciationAudio } from "@/lib/mocks";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+// When no backend URL is configured (preview/local without API server),
+// fall back to mocks so the full UI — pronunciation, coaching feedback —
+// is exercisable. Set VITE_API_BASE_URL to disable.
+const USE_MOCK_FALLBACK = !BASE_URL;
 
 export class UnauthorizedError extends Error {
   constructor(message = "Unauthorized") {
@@ -202,10 +207,17 @@ export async function fetchNextWord(
   }
   // Custom list practice requires auth; level/foreignOrigin are public.
   const headers = opts.customListId ? await authHeaders() : {};
-  const res = await fetch(`${BASE_URL}/api/words/next?${params}`, { headers });
-  if (res.status === 401) throw new UnauthorizedError();
-  if (!res.ok) throw new Error("Failed to fetch word");
-  return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/api/words/next?${params}`, { headers });
+    if (res.status === 401) throw new UnauthorizedError();
+    if (!res.ok) throw new Error("Failed to fetch word");
+    return await res.json();
+  } catch (err) {
+    if (USE_MOCK_FALLBACK && !(err instanceof UnauthorizedError)) {
+      return mockNextWord(opts);
+    }
+    throw err;
+  }
 }
 
 // Module-level promise caches. These endpoints return data that rarely changes
@@ -283,18 +295,28 @@ export async function importCustomWordList(payload: ImportCustomListRequest): Pr
 }
 
 export async function fetchPronunciationAudio(word: string): Promise<string> {
-  const res = await fetch(`${BASE_URL}/api/words/${encodeURIComponent(word)}/pronunciation`);
-  if (!res.ok) throw new Error("Failed to fetch pronunciation");
-  const blob = await res.blob();
-  return URL.createObjectURL(blob);
+  try {
+    const res = await fetch(`${BASE_URL}/api/words/${encodeURIComponent(word)}/pronunciation`);
+    if (!res.ok) throw new Error("Failed to fetch pronunciation");
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+  } catch (err) {
+    if (USE_MOCK_FALLBACK) return mockPronunciationAudio(word);
+    throw err;
+  }
 }
 
 export async function submitSpellingAttempt(body: CoachingRequest): Promise<CoachingResponse> {
-  const res = await fetch(`${BASE_URL}/api/spelling-coach`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error("Failed to submit attempt");
-  return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/api/spelling-coach`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error("Failed to submit attempt");
+    return await res.json();
+  } catch (err) {
+    if (USE_MOCK_FALLBACK) return mockCoaching(body);
+    throw err;
+  }
 }

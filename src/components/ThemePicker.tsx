@@ -88,10 +88,10 @@ export function ThemePicker({ current, onChange }: ThemePickerProps) {
         <TooltipTrigger asChild>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="p-2 rounded-lg bg-muted hover:bg-muted/70 transition-colors"
+            className="p-2 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
             aria-label="Theme"
           >
-            <Palette className="h-4 w-4 text-muted-foreground" />
+            <Palette className="h-4 w-4" />
           </button>
         </TooltipTrigger>
         <TooltipContent>Theme</TooltipContent>
@@ -99,7 +99,7 @@ export function ThemePicker({ current, onChange }: ThemePickerProps) {
 
       {open && (
         <div className="absolute right-0 top-full mt-2 z-50 w-64 rounded-xl border border-border bg-popover p-2 shadow-lg animate-pop-in">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 py-1">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-serif font-semibold text-base px-2 py-1">
             Choose a theme
           </p>
           {THEMES.map((t) => (
@@ -115,7 +115,7 @@ export function ThemePicker({ current, onChange }: ThemePickerProps) {
             >
               <span className="text-lg">{t.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{t.label}</p>
+                <p className="text-sm font-display tracking-tight text-foreground font-serif font-semibold text-base truncate">{t.label}</p>
                 <p className="text-[10px] text-muted-foreground truncate">{t.description}</p>
               </div>
               <div className="flex gap-0.5">

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display&family=Nunito:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -57,9 +57,11 @@
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'DM Sans', sans-serif;
 
-    --channel-green: 152 55% 78%;
+    --channel-green: 145 52% 76%;
     --channel-warm: 35 60% 76%;
     --channel-purple: 250 45% 86%;
+    --channel-yellow: 45 70% 78%;
+    --channel-blue: 210 55% 82%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -122,6 +124,8 @@
     --channel-green: 152 40% 80%;
     --channel-warm: 30 60% 82%;
     --channel-purple: 340 35% 85%;
+    --channel-yellow: 45 60% 82%;
+    --channel-blue: 210 45% 85%;
   }
 
   /* ── Bright & Playful ── */
@@ -177,6 +181,8 @@
     --channel-green: 145 50% 80%;
     --channel-warm: 48 70% 80%;
     --channel-purple: 220 55% 84%;
+    --channel-yellow: 45 65% 80%;
+    --channel-blue: 210 60% 84%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Nunito', sans-serif;
@@ -235,6 +241,8 @@
     --channel-green: 145 45% 78%;
     --channel-warm: 35 55% 80%;
     --channel-purple: 195 45% 82%;
+    --channel-yellow: 45 55% 80%;
+    --channel-blue: 210 45% 82%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Nunito', sans-serif;
@@ -293,6 +301,8 @@
     --channel-green: 160 40% 24%;
     --channel-warm: 45 45% 22%;
     --channel-purple: 270 35% 26%;
+    --channel-yellow: 45 40% 24%;
+    --channel-blue: 210 40% 26%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Nunito', sans-serif;
@@ -351,12 +361,14 @@
     --channel-green: 155 40% 82%;
     --channel-warm: 310 40% 85%;
     --channel-purple: 260 40% 85%;
+    --channel-yellow: 45 50% 82%;
+    --channel-blue: 210 50% 85%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Nunito', sans-serif;
   }
 
-  /* ── Bee / Honeycomb ── */
+  /* ── Bee theme palette tokens ── */
   [data-theme="bee"] {
     --background: 45 55% 95%;
     --foreground: 30 40% 12%;
@@ -409,6 +421,8 @@
     --channel-green: 90 40% 78%;
     --channel-warm: 40 65% 78%;
     --channel-purple: 30 50% 80%;
+    --channel-yellow: 45 60% 78%;
+    --channel-blue: 210 50% 82%;
 
     --font-display: 'Fredoka', sans-serif;
     --font-body: 'Nunito', sans-serif;

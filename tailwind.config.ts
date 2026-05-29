@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         display: ["var(--font-display)"],
         body: ["var(--font-body)"],
+        serif: ["'Fraunces'", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

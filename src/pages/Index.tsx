@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Send, ArrowRight, Volume2, Volume1, VolumeX } from "lucide-react";
+import { Loader2, Send, ArrowRight, Volume2, Volume1, VolumeX, Sparkles } from "lucide-react";
+import confetti from "canvas-confetti";
 import { useCheer } from "@/hooks/use-cheer";
 import { LevelSelector } from "@/components/LevelSelector";
 import { SupportCard } from "@/components/SupportCard";
@@ -38,7 +39,7 @@ const DEFAULT_PROFILE = {
 export default function Index() {
   const [theme, setTheme] = useState<ThemeKey>("default");
   const { soundEnabled, toggleSound, playCheer } = useCheer();
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState(0);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -136,6 +137,7 @@ export default function Index() {
       case "standard":
         setPracticeMode("standard");
         setActiveChannel("standard");
+        setLevel(0);
         break;
       case "customManage":
         setPracticeMode("custom");
@@ -201,7 +203,22 @@ export default function Index() {
         sessionContext: session,
       });
       setResult(res);
-      if (res.correctness?.isCorrect) playCheer();
+      if (res.correctness?.isCorrect) {
+        playCheer();
+        const fire = (origin: { x: number; y: number }) =>
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            startVelocity: 45,
+            origin,
+            zIndex: 9999,
+            colors: ["#f59e0b", "#10b981", "#6366f1", "#ef4444", "#eab308"],
+          });
+        fire({ x: 0.2, y: 0.7 });
+        fire({ x: 0.5, y: 0.6 });
+        fire({ x: 0.8, y: 0.7 });
+        setTimeout(() => fire({ x: 0.5, y: 0.5 }), 200);
+      }
       setSession((s) => ({
         ...s,
         previousAttemptsOnThisWord: s.previousAttemptsOnThisWord + 1,
@@ -268,23 +285,23 @@ export default function Index() {
 
   const channelLabels: Record<PracticeMode, { label: string; Icon: typeof GraduationCap }> = {
     standard: { label: "Standard Practice", Icon: GraduationCap },
-    custom: { label: "Custom Lists", Icon: ListIcon },
+    custom: { label: "My Word Lists", Icon: ListIcon },
     foreignOrigin: { label: "Language Origin", Icon: Globe },
   };
 
   return (
     <div className="min-h-screen">
       {/* Top app bar — webapp style */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-transparent backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
           <button
             onClick={handleBackToDashboard}
-            className="flex items-center gap-2 rounded-lg px-1.5 py-1 -ml-1.5 hover:bg-accent/30 transition-colors"
+            className="flex items-center gap-2 rounded-lg px-1.5 py-1 -ml-1.5 hover:bg-primary/10 transition-colors"
             title="Home"
           >
-            <img src={beePng} alt="Spelling bee mascot" className="h-9 w-auto" />
-            <span className="text-lg font-display font-semibold tracking-tight text-foreground">
-              Spelling Coach
+            <img src={beePng} alt="Spelling bee mascot" className="h-14 w-auto mt-1" />
+            <span className="text-lg font-display tracking-tight text-[#1e3a5f] font-serif font-semibold">
+              AI Spelling Coach
             </span>
           </button>
           <div className="flex items-center gap-1">
@@ -293,7 +310,7 @@ export default function Index() {
               <TooltipTrigger asChild>
                 <button
                   onClick={toggleSound}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                  className="p-2 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                   aria-label="Sound"
                 >
                   {soundEnabled ? <Volume1 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -308,8 +325,9 @@ export default function Index() {
 
       <div className={cn(
         "mx-auto px-4 sm:px-8 py-6 sm:py-10",
-        showDashboard ? "max-w-6xl" : "max-w-2xl"
+        showDashboard ? "max-w-6xl" : "max-w-3xl"
       )}>
+
         {/* Dashboard or active channel header */}
         {showDashboard ? (
           <ChannelsDashboard onSelectChannel={handleSelectChannel} />
@@ -320,7 +338,7 @@ export default function Index() {
               className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg px-2 py-1.5 hover:bg-accent/30"
             >
               <ArrowLeft className="h-4 w-4" />
-              All channels
+              Go Back
             </button>
             {activeChannel && (
               <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
@@ -410,17 +428,30 @@ export default function Index() {
 
         {/* Standard: Level Selector */}
         {showStandardFlow && (
-          <div className="mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm shadow-sm p-6 sm:p-8 space-y-4 relative overflow-hidden"
+          >
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 py-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-primary font-display">
+                  Choose your level
+                </span>
+              </div>
+            </div>
             <LevelSelector selected={level} onSelect={handleLevelChange} />
-          </div>
+          </motion.div>
         )}
 
         {/* Start prompt (standard mode only) */}
         {showStandardFlow && !word && !loading && !error && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-            <p className="text-muted-foreground mb-4">Choose a level above to begin.</p>
+            <p className="text-muted-foreground">Choose a level above to begin.</p>
           </motion.div>
         )}
+
 
         {/* Loading */}
         {showPractice && loading && (
@@ -441,129 +472,152 @@ export default function Index() {
 
         {/* Word Practice Area */}
         {showPractice && hasWord && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            {/* Pronounce Word Button */}
-            <div className="flex flex-col items-center gap-2">
-              <button
-                onClick={playPronunciation}
-                disabled={audioLoading}
-                className={cn(
-                  "flex items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold text-lg transition-all",
-                  "bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed",
-                  "shadow-md hover:shadow-lg",
-                )}
-              >
-                {audioLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Volume2 className="h-6 w-6" />}
-                {audioLoading ? "Loading…" : "Hear the Word"}
-              </button>
-              {audioError && <p className="text-xs text-destructive">{audioError}</p>}
-            </div>
-
-            {/* Word metadata bar */}
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <span className="text-xs rounded-full bg-primary/10 text-primary px-2.5 py-1 font-medium">
-                Level {word.level}
-              </span>
-              <span
-                className={cn(
-                  "text-xs rounded-full px-2.5 py-1 font-medium",
-                  word.difficulty === "easy"
-                    ? "bg-success/10 text-success"
-                    : word.difficulty === "medium"
-                      ? "bg-warning/10 text-warning"
-                      : "bg-destructive/10 text-destructive",
-                )}
-              >
-                {word.difficulty}
-              </span>
-              <span className="text-xs rounded-full bg-chip-accent text-chip-accent-foreground px-2.5 py-1 font-medium">
-                {word.partOfSpeech}
-              </span>
-            </div>
-
-            {/* Support Buttons */}
-            <div className="space-y-2">
-              {!submitted && <p className="text-xs text-muted-foreground text-center">Need a hint? Tap for clues:</p>}
-              {submitted && <p className="text-xs text-muted-foreground text-center">Review word details:</p>}
-              <SupportCard
-                type="definition"
-                content={word.definition}
-                isOpen={defOpen}
-                onToggle={toggleDef}
-              />
-              <SupportCard
-                type="example"
-                content={word.exampleSentence}
-                isOpen={exOpen}
-                onToggle={toggleEx}
-              />
-              <SupportCard type="origin" content={word.origin} isOpen={origOpen} onToggle={toggleOrig} />
-            </div>
-
-            {/* Input Area */}
-            {!submitted && (
-              <div className="space-y-3 pt-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={attempt}
-                  onChange={(e) => setAttempt(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                  placeholder="Type your spelling…"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  className="w-full rounded-xl border-2 border-border bg-card px-4 py-4 text-center text-2xl font-display tracking-widest placeholder:text-muted-foreground/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                />
-                <button
-                  onClick={handleSubmit}
-                  disabled={!attempt.trim() || submitting}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm shadow-sm p-6 sm:p-8 space-y-3"
+          >
+            {/* Header: word metadata + pronounce */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 pb-3 border-b border-border/50">
+              <div className="md:col-span-2 flex items-center gap-2 flex-wrap">
+                <span className="text-xs rounded-full bg-primary/10 text-primary px-2.5 py-1 font-medium">
+                  Level {word.level}
+                </span>
+                <span
                   className={cn(
-                    "w-full flex items-center justify-center gap-2 rounded-xl py-3.5 font-semibold text-base transition-all",
-                    "bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed",
+                    "text-xs rounded-full px-2.5 py-1 font-medium",
+                    word.difficulty === "easy"
+                      ? "bg-success/10 text-success"
+                      : word.difficulty === "medium"
+                        ? "bg-warning/10 text-warning"
+                        : "bg-destructive/10 text-destructive",
                   )}
                 >
-                  {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                  {submitting ? "Checking…" : "Submit"}
-                </button>
+                  {word.difficulty}
+                </span>
+                <span className="text-xs rounded-full bg-chip-accent text-chip-accent-foreground px-2.5 py-1 font-medium">
+                  {word.partOfSpeech}
+                </span>
               </div>
+              <div className="md:col-span-3 flex flex-col items-center">
+                <button
+                  onClick={playPronunciation}
+                  disabled={audioLoading}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold transition-all bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md text-lg"
+                >
+                  {audioLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />}
+                  {audioLoading ? "Loading…" : "Hear the Word"}
+                </button>
+                {audioError && <p className="text-xs text-destructive mt-1">{audioError}</p>}
+              </div>
+            </div>
+
+            {/* Support cards + input — two columns on lg before submission; full width after */}
+            {!submitted ? (
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div className="md:col-span-2 space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1e3a5f] font-display mb-2 px-3">
+                    Hints
+                  </h3>
+                  <SupportCard
+                    type="definition"
+                    content={word.definition}
+                    isOpen={defOpen}
+                    onToggle={toggleDef}
+                  />
+                  <SupportCard
+                    type="example"
+                    content={word.exampleSentence}
+                    isOpen={exOpen}
+                    onToggle={toggleEx}
+                  />
+                  <SupportCard type="origin" content={word.origin} isOpen={origOpen} onToggle={toggleOrig} />
+                </div>
+
+                <div className="md:col-span-3 flex flex-col h-full">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1e3a5f] font-display mb-2 px-3">
+                    Your answer
+                  </h3>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={attempt}
+                    onChange={(e) => setAttempt(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                    placeholder="Type your spelling…"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    className="w-full rounded-xl border-2 border-border bg-background px-4 py-4 text-center text-2xl font-display tracking-widest placeholder:text-muted-foreground/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!attempt.trim() || submitting}
+                    className="mt-auto w-full inline-flex items-center justify-center gap-2 rounded-lg py-3 font-semibold text-sm transition-all bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                    {submitting ? "Checking…" : "Submit"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              result && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <div className="md:col-span-2 space-y-2">
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1e3a5f] font-display mb-2 mx-[8px]">
+                        Word details
+                      </h3>
+                      <SupportCard
+                        type="definition"
+                        content={word.definition}
+                        isOpen={defOpen}
+                        onToggle={toggleDef}
+                      />
+                      <SupportCard
+                        type="example"
+                        content={word.exampleSentence}
+                        isOpen={exOpen}
+                        onToggle={toggleEx}
+                      />
+                      <SupportCard type="origin" content={word.origin} isOpen={origOpen} onToggle={toggleOrig} />
+                    </div>
+                    <div className="md:col-span-3">
+                      <div className="rounded-xl border border-border bg-background p-4 text-center space-y-1">
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your spelling</p>
+                        <p
+                          className={cn(
+                            "text-2xl font-display tracking-widest",
+                            result.correctness.isCorrect ? "text-success" : "text-destructive line-through decoration-2",
+                          )}
+                        >
+                          {attempt}
+                        </p>
+                        {!result.correctness.isCorrect && (
+                          <>
+                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide pt-2">
+                              Correct spelling
+                            </p>
+                            <p className="text-2xl font-display tracking-widest text-success">{word.word}</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <CoachingResult result={result} level={level} />
+                  <button
+                    onClick={handleNextWord}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-lg py-3 font-semibold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
+                  >
+                    <ArrowRight className="h-4 w-4" /> Next Word
+                  </button>
+                </motion.div>
+              )
             )}
 
-            {/* Results */}
-            {submitted && result && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                {word && (
-                  <div className="rounded-xl border-2 border-border bg-card p-4 text-center space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Your spelling</p>
-                    <p
-                      className={cn(
-                        "text-2xl font-display tracking-widest",
-                        result.correctness.isCorrect ? "text-success" : "text-destructive line-through decoration-2",
-                      )}
-                    >
-                      {attempt}
-                    </p>
-                    {!result.correctness.isCorrect && (
-                      <>
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide pt-2">
-                          Correct spelling
-                        </p>
-                        <p className="text-2xl font-display tracking-widest text-success">{word.word}</p>
-                      </>
-                    )}
-                  </div>
-                )}
-                <CoachingResult result={result} />
-                <button
-                  onClick={handleNextWord}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 font-semibold text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-                >
-                  <ArrowRight className="h-5 w-5" /> Next Word
-                </button>
-              </motion.div>
-            )}
           </motion.div>
         )}
+
 
         {/* Debug Panel */}
         <DebugPanel

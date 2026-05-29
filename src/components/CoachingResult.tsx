@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 interface CoachingResultProps {
   result: CoachingResponse;
+  level?: number;
 }
 
 function Section({ icon: Icon, title, children, className }: { icon: React.ElementType; title: string; children: React.ReactNode; className?: string }) {
@@ -38,7 +39,8 @@ const relevanceBadgeStyle: Record<string, string> = {
   unclear: "bg-muted text-muted-foreground",
 };
 
-export function CoachingResult({ result }: CoachingResultProps) {
+export function CoachingResult({ result, level }: CoachingResultProps) {
+  const isLevel1 = level === 1;
   const { correctness, missAnalysis, wordTeaching, errorRelevance, teachingDecision, coachingText, wordBreakdown, conceptLabels, nextStep } = result;
   const isCorrect = correctness.isCorrect;
 
@@ -68,7 +70,7 @@ export function CoachingResult({ result }: CoachingResultProps) {
       )}
 
       {/* What Happened */}
-      {!isCorrect && missAnalysis?.summary && (
+      {!isLevel1 && !isCorrect && missAnalysis?.summary && (
         <Section icon={XCircle} title="What Happened">
           <p>{missAnalysis.summary}</p>
           {missAnalysis.primaryErrorFocus && (
@@ -90,7 +92,7 @@ export function CoachingResult({ result }: CoachingResultProps) {
       )}
 
       {/* Teach The Word */}
-      {wordTeaching && (
+      {!isLevel1 && wordTeaching && (
         <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <div className="flex items-center gap-2 mb-2">
             <Layers className="h-4 w-4 text-primary" />
@@ -111,9 +113,11 @@ export function CoachingResult({ result }: CoachingResultProps) {
       {/* Teaching Decision - hidden for cleaner UX */}
 
       {/* Explanation */}
-      <Section icon={BookOpen} title="Explanation">
-        <p>{coachingText.fullExplanation}</p>
-      </Section>
+      {!isLevel1 && (
+        <Section icon={BookOpen} title="Explanation">
+          <p>{coachingText.fullExplanation}</p>
+        </Section>
+      )}
 
       {/* Memory Tip */}
       {coachingText.memoryTip && (
@@ -130,7 +134,7 @@ export function CoachingResult({ result }: CoachingResultProps) {
       )}
 
       {/* Concept Labels (secondary analytics) */}
-      {(conceptLabels?.originLabels?.length > 0 || conceptLabels?.patternLabels?.length > 0 || conceptLabels?.morphologyLabels?.length > 0) && (
+      {!isLevel1 && (conceptLabels?.originLabels?.length > 0 || conceptLabels?.patternLabels?.length > 0 || conceptLabels?.morphologyLabels?.length > 0) && (
         <div className="rounded-xl border border-border bg-card/60 p-4 space-y-2">
           <h3 className="font-semibold text-xs flex items-center gap-2 text-muted-foreground uppercase tracking-wide">
             <Puzzle className="h-3.5 w-3.5" /> Concept Labels
@@ -142,14 +146,17 @@ export function CoachingResult({ result }: CoachingResultProps) {
       )}
 
       {/* Next Step */}
-      <Section icon={ArrowRight} title="Next Step">
-        <p>{nextStep.practiceFocus}</p>
-        {nextStep.suggestedSimilarWordTypes?.length > 0 && (
-          <div className="mt-2">
-            <LabelChips labels={nextStep.suggestedSimilarWordTypes} variant="accent" title="Try words like" />
-          </div>
-        )}
-      </Section>
+      {!isLevel1 && (
+        <Section icon={ArrowRight} title="Next Step">
+          <p>{nextStep.practiceFocus}</p>
+          {nextStep.suggestedSimilarWordTypes?.length > 0 && (
+            <div className="mt-2">
+              <LabelChips labels={nextStep.suggestedSimilarWordTypes} variant="accent" title="Try words like" />
+            </div>
+          )}
+        </Section>
+      )}
+
     </div>
   );
 }

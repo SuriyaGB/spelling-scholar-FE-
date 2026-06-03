@@ -28,6 +28,9 @@ import { cn } from "@/lib/utils";
 import { AuthMenu } from "@/components/AuthMenu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import beePng from "@/assets/bee.png";
+import { useAuth } from "@/hooks/use-auth";
+import { PaymentDialog } from "@/components/PaymentDialog";
+import { AuthDialog } from "@/components/AuthDialog";
 
 const DEFAULT_PROFILE = {
   childId: "c1",
@@ -37,8 +40,13 @@ const DEFAULT_PROFILE = {
 };
 
 export default function Index() {
-  const [theme, setTheme] = useState<ThemeKey>("default");
+  const [theme, setTheme] = useState<ThemeKey>(() => {
+    return (localStorage.getItem("spelling-coach-theme") as ThemeKey) || "default";
+  });
   const { soundEnabled, toggleSound, playCheer } = useCheer();
+  const { user, subscribed } = useAuth();
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [level, setLevel] = useState(0);
   const [word, setWord] = useState<WordData | null>(null);
   const [attempt, setAttempt] = useState("");
@@ -76,6 +84,7 @@ export default function Index() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme === "default" ? "" : theme);
+    localStorage.setItem("spelling-coach-theme", theme);
   }, [theme]);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -132,6 +141,18 @@ export default function Index() {
     resetWordState();
     setCustomPracticeActive(false);
     setForeignPracticeActive(false);
+
+    // Gate premium features
+    if (selection.kind !== "standard") {
+      if (!user) {
+        setAuthOpen(true);
+        return;
+      }
+      if (!subscribed) {
+        setPaymentOpen(true);
+        return;
+      }
+    }
 
     switch (selection.kind) {
       case "standard":
@@ -633,6 +654,8 @@ export default function Index() {
           foreignPracticeActive={foreignPracticeActive}
         />
       </div>
+      <PaymentDialog open={paymentOpen} onOpenChange={setPaymentOpen} />
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import DataDeletion from "./pages/DataDeletion.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Profile from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/data-deletion" element={<DataDeletion />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

@@ -100,6 +100,14 @@ export function DebugPanel({
               </div>
             </>
           )}
+          <div className="border-t border-muted/20 pt-2 mt-2 space-y-1">
+            <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Environment Variables (Build-time)</div>
+            <div><strong>VITE_API_BASE_URL:</strong> {import.meta.env.VITE_API_BASE_URL || "(empty)"}</div>
+            <div><strong>VITE_SUPABASE_URL:</strong> {import.meta.env.VITE_SUPABASE_URL || "(empty)"}</div>
+            <div><strong>VITE_SUPABASE_PUBLISHABLE_KEY:</strong> {import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ? `${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY.substring(0, 15)}...` : "(empty)"}</div>
+            <div><strong>VITE_SENTRY_DSN:</strong> {import.meta.env.VITE_SENTRY_DSN || "(empty)"}</div>
+            <div><strong>MODE:</strong> {import.meta.env.MODE}</div>
+          </div>
         </div>
       )}
     </div>

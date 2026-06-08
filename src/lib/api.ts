@@ -20,7 +20,10 @@ async function authHeaders(): Promise<Record<string, string>> {
 }
 
 async function handle401(): Promise<never> {
-  await supabase.auth.signOut();
+  const { data } = await supabase.auth.getSession();
+  if (data.session) {
+    await supabase.auth.signOut({ scope: "local" });
+  }
   throw new UnauthorizedError();
 }
 

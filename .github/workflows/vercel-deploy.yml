@@ -3,17 +3,18 @@ name: Manual Vercel Deployment
 on:
   push:
     branches:
-      - Development
+      - prod
+      - dev
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to (preview or production)'
+        description: 'Environment to deploy to (preview or development)'
         required: true
         default: 'preview'
         type: choice
         options:
           - preview
-          - production
+          - development
       description:
         description: 'Optional notes/reason for this manual deployment'
         required: false
@@ -50,7 +51,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      DEPLOY_ENV: ${{ github.event.inputs.environment || ((github.ref == 'refs/heads/Development' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && 'production' || 'preview') }}
+      DEPLOY_ENV: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/prod' && 'production' || 'preview') }}
     defaults:
       run:
         working-directory: ./spelling-scholar-fe
@@ -67,17 +68,17 @@ jobs:
         run: vercel pull --yes --environment=${{ env.DEPLOY_ENV }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         run: vercel build ${{ env.DEPLOY_ENV == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
+          VITE_API_BASE_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_API_BASE_URL || secrets.DEV_VITE_API_BASE_URL }}
+          VITE_SENTRY_DSN: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_SENTRY_DSN || secrets.DEV_VITE_SENTRY_DSN }}
+          VITE_SUPABASE_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_SUPABASE_URL || secrets.DEV_VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_SUPABASE_PUBLISHABLE_KEY || secrets.DEV_VITE_SUPABASE_PUBLISHABLE_KEY }}
 
 
       - name: Deploy Project Artifacts to Vercel
@@ -88,7 +89,7 @@ jobs:
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
 
       - name: Create Deployment Summary
         run: |

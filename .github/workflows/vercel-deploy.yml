@@ -68,13 +68,13 @@ jobs:
         run: vercel pull --yes --environment=${{ env.DEPLOY_ENV }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
         run: vercel build ${{ env.DEPLOY_ENV == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
           VITE_API_BASE_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_API_BASE_URL || secrets.DEV_VITE_API_BASE_URL }}
           VITE_SENTRY_DSN: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_SENTRY_DSN || secrets.DEV_VITE_SENTRY_DSN }}
           VITE_SUPABASE_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VITE_SUPABASE_URL || secrets.DEV_VITE_SUPABASE_URL }}
@@ -89,7 +89,7 @@ jobs:
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_ENV
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_PROJECT_ID: ${{ env.DEPLOY_ENV == 'production' && secrets.PROD_VERCEL_PROJECT_ID || secrets.DEV_VERCEL_PROJECT_ID }}
 
       - name: Create Deployment Summary
         run: |

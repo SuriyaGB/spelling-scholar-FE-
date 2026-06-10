@@ -13,8 +13,8 @@ if (!supabaseConfigured) {
 }
 
 export const supabase: SupabaseClient = createClient(
-  url ?? "https://elcjbbvwbvkjyundtlx.supabase.co",
-  key ?? "placeholder-anon-key",
+  url!,
+  key!,
   {
     auth: {
       persistSession: true,

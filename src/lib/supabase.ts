@@ -13,7 +13,7 @@ if (!supabaseConfigured) {
 }
 
 export const supabase: SupabaseClient = createClient(
-  url ?? "https://placeholder.supabase.co",
+  url ?? "https://elcjbbvwbvkjyundtlx.supabase.co",
   key ?? "placeholder-anon-key",
   {
     auth: {

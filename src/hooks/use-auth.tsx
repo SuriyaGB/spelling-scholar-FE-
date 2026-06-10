@@ -95,10 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     cancelAtPeriodEnd,
     refreshSubscription,
     signInWithPassword: async (email, password) => {
+      if (!supabaseConfigured) return { error: "Auth is not configured. Please contact support." };
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error: error?.message ?? null };
     },
     signUpWithPassword: async (email, password) => {
+      if (!supabaseConfigured) return { error: "Auth is not configured. Please contact support." };
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -107,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error?.message ?? null };
     },
     signInWithGoogle: async () => {
+      if (!supabaseConfigured) return { error: "Auth is not configured. Please contact support." };
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: window.location.origin },
@@ -114,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error?.message ?? null };
     },
     signInWithFacebook: async () => {
+      if (!supabaseConfigured) return { error: "Auth is not configured. Please contact support." };
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "facebook",
         options: { redirectTo: window.location.origin },
@@ -121,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error?.message ?? null };
     },
     signOut: async () => {
+      if (!supabaseConfigured) return;
       await supabase.auth.signOut();
     },
   };
